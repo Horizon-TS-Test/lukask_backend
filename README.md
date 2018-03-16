@@ -2,7 +2,7 @@
 
 ## APP LUKASK
 
-Sistemas de gestión de quejas Ciudanas.
+Sistemas de gestión de quejas Ciudadanas.
 
 ### DJANGO - PYTHON BACKEND
 
