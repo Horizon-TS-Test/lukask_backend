@@ -100,3 +100,8 @@ ENV/
 
 *.sqlite3
 .vagrant
+# Omitimos la configuracion de IDE pyCharm
+.idea/
+
+# Omitimos los Log del servidor virtual. 
+ubuntu-xenial-16.04-cloudimg-console.log
