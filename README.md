@@ -12,3 +12,5 @@ DJANGO - REST FRAMEWORK- PYTHON BACKEND
 
 
 que tal¡
+
+bien amigo fredy y tu como estas.
