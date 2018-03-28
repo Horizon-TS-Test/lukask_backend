@@ -12,8 +12,7 @@ from django.contrib.auth.models import PermissionsMixin
 # Create your models here.
 
 # MANAGER CLASS TO HANDLE ALL MODELS:
-
-
+from pip.cmdoptions import editable
 
 
 class UserProfileManager(BaseUserManager):
@@ -111,9 +110,9 @@ class Person(models.Model):
     telephone = models.TextField(max_length=10)
     address = models.TextField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
-    user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_update = models.DateTimeField()
-    user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
 
     def get_full_name(self):
@@ -133,16 +132,16 @@ class Person(models.Model):
  # TABLE PROFILE
 
 class Profile(models.Model):
-    id_profile= models.IntegerField()
+    id_profile= models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     description = models.TextField(max_length=100)
     users = models.ManyToManyField(
                     UserProfile,
                     through='ProfileUser',
                     through_fields=('profile', 'user'))
     date_register = models.DateTimeField(auto_now_add=True)
-    user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_update = models.DateTimeField()
-    user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
 
 
@@ -155,10 +154,39 @@ class ProfileUser(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_login = models.DateTimeField()
     date_register = models.DateTimeField(auto_now_add=True)
-    user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_update = models.DateTimeField()
-    user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
 
 
-#
+# TABLE PUBLICATIONS
+
+class Publication(models.Model):
+    id_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    detail = models.TextField(max_length= 300)
+    date_publication = models.DateTimeField()
+    latitude = models.FloatField()
+    length = models.FloatField()
+    priority_publication = models.ForeignKey(PriorityPublication, on_delete=models.CASCADE) # FK TABLE PRIORITY_PUBLICATION
+    type_publication = models.ForeignKey(TypePublication, on_delete=models.CASCADE) # FK TABLE TYPE_PUBLICATION
+
+
+
+# TABLE PRIORITY PUBLICATIONS
+
+class PriorityPublication:
+    id_priority_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    description = models.TextField(max_length=100)
+
+
+# TABLE TYPE PUBLICATIONS
+
+class TypePublication:
+    id_type_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    description = models.TextField(max_length=100)
+
+
+
+# TABLE ACTIVITY
+
