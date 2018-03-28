@@ -198,13 +198,13 @@ class ActionNotification(models.Model):
     Permite gestionar las acciones que se realizan sobre una notificacion, Ejemplo:
     Me intersa, Compartir, etiquetar, recomendat, etc.
     """
-    id_action_notication = models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False)
-    date_register = models.DateTimeField(auto_created=True)
-    user_register = models.ForeignKey(UserProfile,on_delete=models.CASCADE,null=True)
-    date_update = models.DateTimeField()
-    user_update = models.ForeignKey(UserProfile, on_delete = models.CASCADE(null=True))
-    active = models.BooleanField(default=True)
-    tipo_accion = models.ForeignKey(TipoAccion, on_delete= models.CASCADE(null=True))
+    id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False)
+    date_register           =   models.DateTimeField(auto_created=True)
+    date_update             =   models.DateTimeField()
+    active                  =   models.BooleanField(default=True)
+    user_register           =   models.ForeignKey(UserProfile,on_delete=models.CASCADE,null=True)
+    user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE(null=True))
+    tipo_accion             =   models.ForeignKey(TipoAccion, on_delete= models.CASCADE(null=True))
 
 
 # TABLA DE TIPO DE ACCION
@@ -213,11 +213,36 @@ class TipoAccion(models.Model):
     Permite la administracion de tipos de acciones que se realizara sobre una determinada
     notificacion.
     """
-    id_tipo_accion = models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False)
-    description_acction = models.TextField();
-    date_register = models.DateTimeField(auto_created=True)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
-    date_update = models.DateTimeField()
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE(null=True))
-    active = models.BooleanField(default=True)
+    id_tipo_accion      =   models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False)
+    description_acction =   models.CharField(max_length=75)
+    date_register       =   models.DateTimeField(auto_created=True)
+    date_update         =   models.DateTimeField()
+    active              =   models.BooleanField(default=True)
+    user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE(null=True))
 
+
+class Multimedia(models.Model):
+    """
+    Se encarga de almacenar los archivos multimeria de publicacion.
+    """
+    audio = 'AD'
+    video = 'VD'
+    image = 'IG'
+    file  = 'FL'
+    format_multimedia_choices = (
+        (audio, 'AUDIO'),
+        (video, 'VIDEO'),
+        (image, 'IMAGE'),
+        (file, 'FILE')
+    )
+    format_multimedia   =   models.CharField(max_length=2, choices= format_multimedia_choices, default = image)
+    id_multimedia       =   models.UUIDField(primary_key=True, default=uuid.uuid4(), editable = False)
+    name_file           =   models.CharField(max_length=50)
+    description_file    =   models.CharField(max_length=50)
+    path_file           =   models.TextField(max_length=200)
+    date_register       =   models.DateTimeField(auto_created=True)
+    date_update         =   models.DateTimeField()
+    active              =   models.BooleanField(default=True)
+    user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE(null=True))
