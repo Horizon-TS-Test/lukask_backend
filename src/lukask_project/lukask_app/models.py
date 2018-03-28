@@ -189,7 +189,7 @@ class TypePublication:
 
 
 # TABLE ACTIVITY
-
+## por favor paty intenta comentar lo que dentro de las clases
 
 # TABLA SERVICIOS BASICOS
 
