@@ -183,12 +183,24 @@ class PriorityPublication:
 # TABLE TYPE PUBLICATIONS
 
 class TypePublication:
+    """
+    Permite gestionar los  tipos de publicaciones
+    """
     id_type_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
     description = models.TextField(max_length=100)
 
 
 
 # TABLE ACTIVITY
+
+class Activity:
+    id_activity = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    estimated_start_date = models.DateTimeField()
+    real_start_date =  models.DateTimeField()
+    estimated_end_date = models.DateTimeField()
+    real_end_date = models.DateTimeField
+
+
 
 
 # TABLA SERVICIOS BASICOS
