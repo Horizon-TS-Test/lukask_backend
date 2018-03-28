@@ -102,18 +102,23 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     # TABLE PERSON
 class Person(models.Model):
+    """
+    Este modelo permite gestionar la informacion de personas
+    Campos: id_persona, edad, cédula, nombre, apellido, teléfono, direccion,
+    fecha_registro, usuario_registro, fecha_actualizacion,  usuario_actualizacion, activo
+    """
     id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    identification_card = models.TextField(max_length=13)
-    name = models.TextField(max_length=50)
-    last_name = models.TextField(max_length=50)
     age = models.IntegerField()
-    telephone = models.TextField(max_length=10)
-    address = models.TextField(max_length=75)
+    identification_card = models.CharField(max_length=10)
+    name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    telephone = models.CharField(max_length=10)
+    address = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_update = models.DateTimeField()
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
     def get_full_name(self):
         """
@@ -132,76 +137,143 @@ class Person(models.Model):
  # TABLE PROFILE
 
 class Profile(models.Model):
+    """
+     Este modelo permite gestionar los perfiles
+     Campos: id_perfil, descripcion, fecha_registro, fecha_actualizacion,
+      activo, usuario_registro,  usuario_actualizacion
+     """
     id_profile= models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    description = models.TextField(max_length=100)
+    description = models.CharField(max_length=75)
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     users = models.ManyToManyField(
                     UserProfile,
                     through='ProfileUser',
                     through_fields=('profile', 'user'))
-    date_register = models.DateTimeField(auto_now_add=True)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    date_update = models.DateTimeField()
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    active = models.BooleanField(default=True)
-
-
-
 
 # TABLE USER PROFILE n-n
 
 class ProfileUser(models.Model):
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    """
+     Este modelo permite gestionar los perfiles de los usuarios
+     Campos: fecha_login, fecha_registro, fecha_actualizacion
+     activo, usuario, perfil, usuario_registro, usuario_actualizacion
+    """
     date_login = models.DateTimeField()
     date_register = models.DateTimeField(auto_now_add=True)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     date_update = models.DateTimeField()
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 
 # TABLE PUBLICATIONS
 
 class Publication(models.Model):
+    """
+    Este modelo permite gestionar las publicaciones que realicen los usuarios
+    Campos: id_publicacion, latitud, longitud,  detalle, fecha_publicacion,
+    fecha_registro, fecha_actualizacion, activo,  prioridad_publicacion, tipo_publicacion, actividad,
+     usuario_registro, usuario_actualizacion
+    """
     id_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    detail = models.TextField(max_length= 300)
-    date_publication = models.DateTimeField()
     latitude = models.FloatField()
     length = models.FloatField()
+    detail = models.TextField(max_length= 300)
+    date_publication = models.DateTimeField()
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField()
+    active = models.BooleanField(default=True)
     priority_publication = models.ForeignKey(PriorityPublication, on_delete=models.CASCADE) # FK TABLE PRIORITY_PUBLICATION
     type_publication = models.ForeignKey(TypePublication, on_delete=models.CASCADE) # FK TABLE TYPE_PUBLICATION
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)  # FK TABLE ACTIVITY
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 
 
 # TABLE PRIORITY PUBLICATIONS
 
 class PriorityPublication:
+    """
+    Este modelo permite gestionar la prioridad que tiene cada una de las publicaciones de los usuarios
+    Campos: id_prioridad_publicacion, descripcion, fecha_registro, fecha_actualizacion, activo
+     usuario_registro, usuario_actualizacion
+     """
     id_priority_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    description = models.TextField(max_length=100)
+    description = models.CharField(max_length=75)
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 
 # TABLE TYPE PUBLICATIONS
 
 class TypePublication:
     """
-    Permite gestionar los  tipos de publicaciones
+    Permite gestionar los tipos de publicaciones
+    Campos: id_tipo_publicacion, descripcion, fecha_registro, fecha_actualizacion
+    usuario_registro, activo,  usuario_actualizacion
     """
     id_type_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    description = models.TextField(max_length=100)
+    description = models.CharField(max_length=75)
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
+
+# TABLE TRACING
+class Tracing:
+    """
+    Permite gestionar el seguimiento de las publicaciones realizadas por los usuarios
+    Campos: id_seguimiento, porcentaje de avance, fecha_inicio, fecha_fin_estimada, fecha_fin_real,
+    fecha_registro, fecha_actualizacion, activo, usuario_registro, publicacion,
+    usuario_registro, usuario_actualizacion
+    """
+    id_tracing = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    percentage_avance = models.FloatField()
+    date_start = models.DateTimeField()
+    estimated_end_date = models.DateTimeField()
+    real_end_date = models.DateTimeField()
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    publication = models.ForeignKey(Publication, on_delete=models.CASCADE) # FK TABLE PUBLICATION
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 
 # TABLE ACTIVITY
 
 class Activity:
+    """
+     Permite gestionar el seguimiento de las publicaciones realizadas por los usuarios
+     Campos: id_actividad, descripcion, fecha_inicio_estimada, fecha_fin_real, fecha_fin_estimada, fecha_fin_real,
+     fecha_registro, fecha_actualizacion, publicado, activo, seguimiento,
+     usuario_registro, usuario_actualizacion
+       """
     id_activity = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    description_activity = models.CharField(max_length=75)
     estimated_start_date = models.DateTimeField()
     real_start_date =  models.DateTimeField()
     estimated_end_date = models.DateTimeField()
-    real_end_date = models.DateTimeField
-
-
-
+    real_end_date = models.DateTimeField()
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField()
+    published = models.BooleanField(default=True)
+    active = models.BooleanField(default=True)
+    tracing = models.ForeignKey(Tracing, on_delete=models.CASCADE) # FK TABLE TRACING
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 # TABLA SERVICIOS BASICOS
 
