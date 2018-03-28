@@ -161,4 +161,37 @@ class ProfileUser(models.Model):
     active = models.BooleanField(default=True)
 
 
-#
+# TABLA SERVICIOS BASICOS
+
+class ActionNotification(models.Model):
+    """
+    Permite gestionar las acciones que se realizan sobre una notificacion, Ejemplo:
+    Me intersa, Compartir, etiquetar, recomendat, etc.
+    """
+    id_action_notication = models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False)
+    date_register = models.DateTimeField(auto_created=True)
+    user_register = models.ForeignKey(UserProfile,on_delete=models.CASCADE,null=True)
+    date_update = models.DateTimeField()
+    user_update = models.ForeignKey(UserProfile, on_delete = models.CASCADE(null=True))
+    active = models.BooleanField(default=True)
+    tipo_accion = models.ForeignKey(TipoAccion, on_delete= models.CASCADE(null=True))
+
+
+# TABLA DE TIPO DE ACCION
+class TipoAccion(models.Model):
+    """
+    Permite la administracion de tipos de acciones que se realizara sobre una determinada
+    notificacion.
+    """
+    id_tipo_accion = models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False)
+    description_acction = models.TextField();
+    date_register = models.DateTimeField(auto_created=True)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    date_update = models.DateTimeField()
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE(null=True))
+    active = models.BooleanField(default=True)
+
+
+
+
+
