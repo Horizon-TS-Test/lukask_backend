@@ -172,31 +172,6 @@ class ProfileUser(models.Model):
     user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 
-# TABLE PUBLICATIONS
-
-class Publication(models.Model):
-    """
-    Este modelo permite gestionar las publicaciones que realicen los usuarios
-    Campos: id_publicacion, latitud, longitud,  detalle, fecha_publicacion,
-    fecha_registro, fecha_actualizacion, activo,  prioridad_publicacion, tipo_publicacion, actividad,
-     usuario_registro, usuario_actualizacion
-    """
-    id_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-    latitude = models.FloatField()
-    length = models.FloatField()
-    detail = models.TextField(max_length= 300)
-    date_publication = models.DateTimeField()
-    date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
-    active = models.BooleanField(default=True)
-    priority_publication = models.ForeignKey(PriorityPublication, on_delete=models.CASCADE) # FK TABLE PRIORITY_PUBLICATION
-    type_publication = models.ForeignKey(TypePublication, on_delete=models.CASCADE) # FK TABLE TYPE_PUBLICATION
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)  # FK TABLE ACTIVITY
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-
-
-
 # TABLE PRIORITY PUBLICATIONS
 
 class PriorityPublication:
@@ -214,6 +189,7 @@ class PriorityPublication:
     user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
 
 
+
 # TABLE TYPE PUBLICATIONS
 
 class TypePublication:
@@ -227,8 +203,8 @@ class TypePublication:
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField()
     active = models.BooleanField(default=True)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE)
 
 
 # TABLE TRACING
@@ -236,7 +212,7 @@ class Tracing:
     """
     Permite gestionar el seguimiento de las publicaciones realizadas por los usuarios
     Campos: id_seguimiento, porcentaje de avance, fecha_inicio, fecha_fin_estimada, fecha_fin_real,
-    fecha_registro, fecha_actualizacion, activo, usuario_registro, publicacion,
+    fecha_registro, fecha_actualizacion, activo, usuario_registro,
     usuario_registro, usuario_actualizacion
     """
     id_tracing = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -247,9 +223,10 @@ class Tracing:
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField()
     active = models.BooleanField(default=True)
-    publication = models.ForeignKey(Publication, on_delete=models.CASCADE) # FK TABLE PUBLICATION
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+    user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+
 
 
 # TABLE ACTIVITY
@@ -271,9 +248,42 @@ class Activity:
     date_update = models.DateTimeField()
     published = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
-    tracing = models.ForeignKey(Tracing, on_delete=models.CASCADE) # FK TABLE TRACING
+    tracing = models.ForeignKey('tracing', on_delete=models.CASCADE) # FK TABLE TRACING
+    user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+
+
+# TABLE PUBLICATIONS
+
+class Publication(models.Model):
+    """
+    Este modelo permite gestionar las publicaciones que realicen los usuarios
+    Campos: id_publicacion, latitud, longitud,  detalle, fecha_publicacion,
+    fecha_registro, fecha_actualizacion, activo,  prioridad_publicacion, tipo_publicacion, seguimiento,
+     usuario_registro, usuario_actualizacion
+    """
+    id_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    latitude = models.FloatField()
+    length = models.FloatField()
+    detail = models.TextField(max_length= 300)
+    date_publication = models.DateTimeField()
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField()
+    active = models.BooleanField(default=True)
+    priority_publication = models.ForeignKey('priorityPublication', on_delete=models.CASCADE) # FK TABLE PRIORITY_PUBLICATION
+    type_publication = models.ForeignKey('typePublication', on_delete=models.CASCADE) # FK TABLE TYPE_PUBLICATION
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)  # FK TABLE ACTIVITY
+    tracing = models.ForeignKey(Tracing, on_delete=models.CASCADE)  # FK TABLE ACTIVITY
     user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+
+
+
+
+
+
+
+
 
 # TABLA SERVICIOS BASICOS
 
