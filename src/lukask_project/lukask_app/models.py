@@ -96,22 +96,69 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
         """
         return self.email
-    #--------------------------------------------------------------------------------------#
-    # --------------DEFINICION DE MODELOS DE BASE DE DATOS PARA APLICACION LUKASK----------#
-    # --------------------------------------------------------------------------------------#
+
+#--------------------------------------------------------------------------------------#
+#---------------DEFINICION DE MODELOS DE BASE DE DATOS PARA APLICACION LUKASK----------#
+#--------------------------------------------------------------------------------------#
 
     # TABLE PERSON
-    class Person(models.Model):
-        id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
-        identification_card = models.TextField(max_length=13)
-        name = models.TextField(max_length=50)
-        last_name = models.TextField(max_length=50)
-        age = models.IntegerField()
-        telephone = models.TextField(max_length=10)
-        address = models.TextField(max_length=75)
-        date_register = models.DateTimeField(auto_now_add=True)
-        user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-        date_update = models.DateTimeField()
-        user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
-        active = models.BooleanField(default=False)
+class Person(models.Model):
+    id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    identification_card = models.TextField(max_length=13)
+    name = models.TextField(max_length=50)
+    last_name = models.TextField(max_length=50)
+    age = models.IntegerField()
+    telephone = models.TextField(max_length=10)
+    address = models.TextField(max_length=75)
+    date_register = models.DateTimeField(auto_now_add=True)
+    user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    date_update = models.DateTimeField()
+    user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True)
 
+    def get_full_name(self):
+        """
+        USED TO GET A USER'S FULL NAME
+        """
+        return self.name + self.last_name
+
+    def get_short_name(self):
+        """
+        USED TO GET A USER'S SHORT NAME
+        """
+        return self.name
+
+
+
+ # TABLE PROFILE
+
+class Profile(models.Model):
+    id_profile= models.IntegerField()
+    description = models.TextField(max_length=100)
+    users = models.ManyToManyField(
+                    UserProfile,
+                    through='ProfileUser',
+                    through_fields=('profile', 'user'))
+    date_register = models.DateTimeField(auto_now_add=True)
+    user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    date_update = models.DateTimeField()
+    user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True)
+
+
+
+
+# TABLE USER PROFILE n-n
+
+class ProfileUser(models.Model):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    date_login = models.DateTimeField()
+    date_register = models.DateTimeField(auto_now_add=True)
+    user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    date_update = models.DateTimeField()
+    user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+    active = models.BooleanField(default=True)
+
+
+#
