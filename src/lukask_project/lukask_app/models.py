@@ -14,6 +14,8 @@ from django.contrib.auth.models import PermissionsMixin
 # MANAGER CLASS TO HANDLE ALL MODELS:
 
 
+
+
 class UserProfileManager(BaseUserManager):
     """
     HELPS DJANGO WORK WITH OUR CUSTOM USER MODEL.
@@ -94,3 +96,22 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
         DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
         """
         return self.email
+    #--------------------------------------------------------------------------------------#
+    # --------------DEFINICION DE MODELOS DE BASE DE DATOS PARA APLICACION LUKASK----------#
+    # --------------------------------------------------------------------------------------#
+
+    # TABLE PERSON
+    class Person(models.Model):
+        id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+        identification_card = models.TextField(max_length=13)
+        name = models.TextField(max_length=50)
+        last_name = models.TextField(max_length=50)
+        age = models.IntegerField()
+        telephone = models.TextField(max_length=10)
+        address = models.TextField(max_length=75)
+        date_register = models.DateTimeField(auto_now_add=True)
+        user_register = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+        date_update = models.DateTimeField()
+        user_update = models.OneToOneField(UserProfile, on_delete=models.CASCADE)
+        active = models.BooleanField(default=False)
+
