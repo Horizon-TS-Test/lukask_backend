@@ -58,43 +58,7 @@ class UserProfileManager(BaseUserManager):
         return user
 
 
-class UserProfile(AbstractBaseUser, PermissionsMixin):
-    """
-    REPRESENT A "USER PROFILE" INSIDE OUR APP.
-    """
 
-    # DJANGO MODELS REF: https://docs.djangoproject.com/en/1.11/topics/db/models/
-    email = models.EmailField(max_length=100, unique=True)
-    ci_ruc = models.CharField(max_length=13, blank=False)
-    first_name = models.CharField(max_length=100, blank=False)
-    last_name = models.CharField(max_length=100, blank=False)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    last_login = models.DateTimeField(null=True, blank=True)
-    date_joined = models.DateTimeField(default=django.utils.timezone.now, blank=False)
-
-    objects = UserProfileManager()
-
-    USERNAME_FIELD = 'email'  # EMAIL IS REQUIRED BY DEFAULT
-    REQUIRED_FIELDS = ['ci_ruc', 'first_name', 'last_name']
-
-    def get_full_name(self):
-        """
-        USED TO GET A USER'S FULL NAME
-        """
-        return self.first_name + self.last_name
-
-    def get_short_name(self):
-        """
-        USED TO GET A USER'S SHORT NAME
-        """
-        return self.first_name
-
-    def __str__(self):
-        """
-        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
-        """
-        return self.email
 
 #--------------------------------------------------------------------------------------#
 #---------------DEFINICION DE MODELOS DE BASE DE DATOS PARA APLICACION LUKASK----------#
@@ -104,7 +68,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 class Person(models.Model):
     """
     Este modelo permite gestionar la informacion de personas
-    Campos: id_persona, edad, cédula, nombre, apellido, teléfono, direccion,
+    Campos: id_persona, edad, cedula, nombre, apellido, telefono, direccion,
     fecha_registro, usuario_registro, fecha_actualizacion,  usuario_actualizacion, activo
     """
     id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
@@ -114,11 +78,9 @@ class Person(models.Model):
     last_name = models.CharField(max_length=50)
     telephone = models.CharField(max_length=10)
     address = models.CharField(max_length=75)
-    date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
     active = models.BooleanField(default=True)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pr")
+    #user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    #user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pr")
 
     def get_full_name(self):
         """
@@ -132,7 +94,29 @@ class Person(models.Model):
         """
         return self.name
 
+class UserProfile(AbstractBaseUser, PermissionsMixin):
+    """
+    REPRESENT A "USER PROFILE" INSIDE OUR APP.
+    """
 
+    # DJANGO MODELS REF: https://docs.djangoproject.com/en/1.11/topics/db/models/
+    email = models.EmailField(max_length=100, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    last_login = models.DateTimeField(null=True, blank=True)
+    date_joined =  models.DateTimeField()
+    person = models.OneToOneField('person', on_delete=models.CASCADE, null=True)
+
+    objects = UserProfileManager()
+
+    USERNAME_FIELD = 'email'  # EMAIL IS REQUIRED BY DEFAULT
+
+
+    def __str__(self):
+        """
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
+        """
+        return self.email
 
  # TABLE PROFILE
 class Profile(models.Model):
