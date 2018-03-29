@@ -85,7 +85,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lukask_db',
         'USER': 'lukask_back_user',
-        'PASSWORD': 'lukask7!',
+        'PASSWORD': 'lukask',
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'ATOMIC_REQUESTS': False,

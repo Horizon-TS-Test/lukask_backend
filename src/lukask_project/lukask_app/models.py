@@ -118,7 +118,7 @@ class Person(models.Model):
     date_update = models.DateTimeField()
     active = models.BooleanField(default=True)
     user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pr")
 
     def get_full_name(self):
         """
@@ -135,7 +135,6 @@ class Person(models.Model):
 
 
  # TABLE PROFILE
-
 class Profile(models.Model):
     """
      Este modelo permite gestionar los perfiles
@@ -147,15 +146,14 @@ class Profile(models.Model):
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField()
     active = models.BooleanField(default=True)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_register_pf")
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pf")
     users = models.ManyToManyField(
                     UserProfile,
                     through='ProfileUser',
                     through_fields=('profile', 'user'))
 
 # TABLE USER PROFILE n-n
-
 class ProfileUser(models.Model):
     """
      Este modelo permite gestionar los perfiles de los usuarios
@@ -168,13 +166,12 @@ class ProfileUser(models.Model):
     active = models.BooleanField(default=True)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_register_pu")
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null = True, related_name = "user_update_pu")
 
 
 # TABLE PRIORITY PUBLICATIONS
-
-class PriorityPublication:
+class PriorityPublication(models.Model):
     """
     Este modelo permite gestionar la prioridad que tiene cada una de las publicaciones de los usuarios
     Campos: id_prioridad_publicacion, descripcion, fecha_registro, fecha_actualizacion, activo
@@ -186,13 +183,13 @@ class PriorityPublication:
     date_update = models.DateTimeField()
     active = models.BooleanField(default=True)
     user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null = True, related_name="user_update_pp")
 
 
 
 # TABLE TYPE PUBLICATIONS
 
-class TypePublication:
+class TypePublication(models.Model):
     """
     Permite gestionar los tipos de publicaciones
     Campos: id_tipo_publicacion, descripcion, fecha_registro, fecha_actualizacion
@@ -204,11 +201,11 @@ class TypePublication:
     date_update = models.DateTimeField()
     active = models.BooleanField(default=True)
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
-    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null = True, related_name="user_update_tp")
 
 
 # TABLE TRACING
-class Tracing:
+class Tracing(models.Model):
     """
     Permite gestionar el seguimiento de las publicaciones realizadas por los usuarios
     Campos: id_seguimiento, porcentaje de avance, fecha_inicio, fecha_fin_estimada, fecha_fin_real,
@@ -225,13 +222,13 @@ class Tracing:
     active = models.BooleanField(default=True)
 
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
-    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null = True, related_name="user_update_tc")
 
 
 
 # TABLE ACTIVITY
 
-class Activity:
+class Activity(models.Model):
     """
      Permite gestionar el seguimiento de las publicaciones realizadas por los usuarios
      Campos: id_actividad, descripcion, fecha_inicio_estimada, fecha_fin_real, fecha_fin_estimada, fecha_fin_real,
@@ -250,7 +247,7 @@ class Activity:
     active = models.BooleanField(default=True)
     tracing = models.ForeignKey('tracing', on_delete=models.CASCADE) # FK TABLE TRACING
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
-    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE)
+    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_at")
 
 
 # TABLE PUBLICATIONS
@@ -272,37 +269,13 @@ class Publication(models.Model):
     active = models.BooleanField(default=True)
     priority_publication = models.ForeignKey('priorityPublication', on_delete=models.CASCADE) # FK TABLE PRIORITY_PUBLICATION
     type_publication = models.ForeignKey('typePublication', on_delete=models.CASCADE) # FK TABLE TYPE_PUBLICATION
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)  # FK TABLE ACTIVITY
-    tracing = models.ForeignKey(Tracing, on_delete=models.CASCADE)  # FK TABLE ACTIVITY
-    user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-
-
-
-
-
-
-
-
-
-# TABLA SERVICIOS BASICOS
-
-class ActionNotification(models.Model):
-    """
-    Permite gestionar las acciones que se realizan sobre una notificacion, Ejemplo:
-    Me intersa, Compartir, etiquetar, recomendat, etc.
-    """
-    id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False)
-    date_register           =   models.DateTimeField(auto_created=True)
-    date_update             =   models.DateTimeField()
-    active                  =   models.BooleanField(default=True)
-    user_register           =   models.ForeignKey(UserProfile,on_delete=models.CASCADE,null=True)
-    user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE(null=True))
-    tipo_accion             =   models.ForeignKey(TipoAccion, on_delete= models.CASCADE(null=True))
-
+    activity = models.ForeignKey('activity', on_delete=models.CASCADE)  # FK TABLE ACTIVITY
+    tracing = models.ForeignKey('tracing', on_delete=models.CASCADE)  # FK TABLE ACTIVITY
+    user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE,  null=True)
+    user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_pl")
 
 # TABLA DE TIPO DE ACCION
-class TipoAccion(models.Model):
+class TypeAccion(models.Model):
     """
     Permite la administracion de tipos de acciones que se realizara sobre una determinada
     notificacion.
@@ -313,9 +286,25 @@ class TipoAccion(models.Model):
     date_update         =   models.DateTimeField()
     active              =   models.BooleanField(default=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
-    user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE(null=True))
+    user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_ta")
 
 
+# TABLA SERVICIOS BASICOS
+class ActionNotification(models.Model):
+    """
+    Permite gestionar las acciones que se realizan sobre una notificacion, Ejemplo:
+    Me intersa, Compartir, etiquetar, recomendat, etc.
+    """
+    id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False)
+    date_register           =   models.DateTimeField(auto_created=True)
+    date_update             =   models.DateTimeField()
+    active                  =   models.BooleanField(default=True)
+    user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
+    user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
+    tipo_accion             =   models.ForeignKey(TypeAccion, on_delete= models.CASCADE)
+
+
+# TABLA MULTIMEDIA
 class Multimedia(models.Model):
     """
     Se encarga de almacenar los archivos multimeria de publicacion.
@@ -339,4 +328,4 @@ class Multimedia(models.Model):
     date_update         =   models.DateTimeField()
     active              =   models.BooleanField(default=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
-    user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE(null=True))
+    user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_mul")
