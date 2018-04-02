@@ -83,3 +83,73 @@ class ActionViewSet(viewsets.ModelViewSet):
     #search_fields = ('description_action')
 
     authentication_classes = (TokenAuthentication,)
+
+class PriorityPublicationViewSet(viewsets.ModelViewSet):
+    """"
+    HANDLES CREATING, READING AND UPDATING TODOS.
+        """
+    serializer_class = serializers.PriorityPublicationSerializer
+    queryset = models.PriorityPublication.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description')
+
+    authentication_classes = (TokenAuthentication,)
+
+class TypePublicationViewSet(viewsets.ModelViewSet):
+    """"
+    HANDLES CREATING, READING AND UPDATING TODOS.
+        """
+    serializer_class = serializers.TypePublicationSerializer
+    queryset = models.TypePublication.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description')
+
+    authentication_classes = (TokenAuthentication,)
+
+
+class TracingViewSet(viewsets.ModelViewSet):
+    """"
+    HANDLES CREATING, READING AND UPDATING TODOS.
+        """
+    serializer_class = serializers.TracingSerializer
+    queryset = models.Tracing.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    #search_fields = ('description')
+
+    authentication_classes = (TokenAuthentication,)
+
+
+class ActivityViewSet(viewsets.ModelViewSet):
+    """"
+    HANDLES CREATING, READING AND UPDATING TODOS.
+        """
+    serializer_class = serializers.ActivitySerializer
+    queryset = models.Activity.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_activity')
+
+    authentication_classes = (TokenAuthentication,)
+
+
+class PublicationViewSet(viewsets.ModelViewSet):
+    """"
+    HANDLES CREATING, READING AND UPDATING TODOS.
+        """
+    serializer_class = serializers.PublicationSerializer
+    queryset = models.Publication.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('detail')
+
+    authentication_classes = (TokenAuthentication,)
+
+
+class MultimediaViewSet(viewsets.ModelViewSet):
+    """"
+    HANDLES CREATING, READING AND UPDATING TODOS.
+        """
+    serializer_class = serializers.MultimediaSerializer
+    queryset = models.Multimedia.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_file')
+
+    authentication_classes = (TokenAuthentication,)

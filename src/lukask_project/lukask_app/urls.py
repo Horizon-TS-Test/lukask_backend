@@ -8,6 +8,14 @@ router.register("userProfile", views.UserProfileViewSet)
 router.register("Person", views.PersonViewSet)
 router.register("TypeAction", views.TypeActionViewSet)
 router.register("action", views.ActionViewSet)
+router.register("prioPub", views.PriorityPublicationViewSet)
+router.register("typePub", views.TypePublicationViewSet)
+router.register("publication", views.PublicationViewSet)
+router.register("tracing", views.TracingViewSet)
+router.register("activity", views.ActivityViewSet)
+router.register("multimedia", views.MultimediaViewSet)
+
+
 
 urlpatterns = [
     url(r'', include(router.urls))

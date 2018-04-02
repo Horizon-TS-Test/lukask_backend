@@ -92,8 +92,8 @@ class TracingSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Tracing
         fields = ('id_tracing', 'percentage_avance', 'date_start', 'estimated_end_date',
-                  'real_end_date', 'date_register', 'date_update', 'active', 'user_register',
-                  'user_update')
+                  'real_end_date', 'date_register', 'date_update', 'active', 'publication',
+                  'user_register', 'user_update')
 
 
 
@@ -109,7 +109,7 @@ class PublicationSerializer(serializers.ModelSerializer):
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'date_publication', 'date_register',
-                'date_update', 'active', 'priority_publication', 'type_publication', 'activity', 'tracing',
+                'date_update', 'active', 'priority_publication', 'type_publication', 'activity',
                 'user_register', 'user_update')
 
 
@@ -118,11 +118,11 @@ class ActionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.ActionNotification
         fields = ('id_action_notification', 'date_register', 'date_update', 'active', 'user_register',
-                  'user_update', 'type_action')
+                  'user_update', 'type_action', 'publication')
 
 
 class MultimediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Multimedia
         fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'path_file', 'date_register',
-                  'date_update', 'active', 'user_register', 'user_update')
+                  'date_update', 'active', 'publication', 'user_register', 'user_update')
