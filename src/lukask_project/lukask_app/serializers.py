@@ -54,18 +54,76 @@ class PersonSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
-        models = models.Profile
-        fields = ('id_profile', 'description', 'date_register', 'date_update',
-                  'active', 'user_register', 'user_update')
+       model = models.Profile
+       fields = ('id_profile', 'description', 'date_register', 'date_update',
+                  'active', 'user_register', 'user_update', 'users')
+
+
+
+class ProfileUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.ProfileUser
+        fields = ('date_login', 'date_register', 'date_update', 'active', 'user',
+                  'profile', 'user_register', 'user_update')
 
 
 class PriorityPublicationSerializer(serializers.ModelSerializer):
     class Meta:
-        models = models.PriorityPublication
+        model = models.PriorityPublication
         fields = ('id_priority_publication', 'description', 'date_register',
                   'date_update', 'active', 'user_register', 'user_update')
 
-#class TypePublicationSerializer()
+
+class TypePublicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TypePublication
+        fields = ('id_type_publication','description','date_register',
+                  'date_update', 'active', 'user_register', 'user_update')
+
+
+class TypeActionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.TypeAction
+        fields = ('id_type_action', 'description_action', 'date_register',
+                  'date_update', 'active', 'user_register', 'user_update')
+
+
+class TracingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Tracing
+        fields = ('id_tracing', 'percentage_avance', 'date_start', 'estimated_end_date',
+                  'real_end_date', 'date_register', 'date_update', 'active', 'user_register',
+                  'user_update')
 
 
 
+class ActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Activity
+        fields = ('id_activity', 'description_activity', 'estimated_start_date', 'real_start_date',
+              'estimated_end_date', 'real_end_date', 'date_register', 'date_update', 'published',
+              'active', 'tracing', 'user_register', 'user_update')
+
+
+class PublicationSerializer(serializers.ModelSerializer):
+   class Meta:
+      model = models.Publication
+      fields = ('id_publication', 'latitude', 'length', 'detail', 'date_publication', 'date_register',
+                'date_update', 'active', 'priority_publication', 'type_publication', 'activity', 'tracing',
+                'user_register', 'user_update')
+
+
+
+class ActionSerializer(serializers.ModelSerializer):
+    #typeA = serializers.StringRelatedField(many=True)
+    class Meta:
+        model = models.ActionNotification
+        fields = ('id_action_notification', 'date_register', 'date_update', 'active', 'user_register',
+                  'user_update', 'type_action')
+
+
+class MultimediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Multimedia
+        fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'path_file', 'date_register',
+                  'date_update', 'active', 'user_register', 'user_update')

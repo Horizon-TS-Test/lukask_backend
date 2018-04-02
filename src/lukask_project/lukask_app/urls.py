@@ -6,7 +6,8 @@ router = DefaultRouter()
 router.register("login", views.LoginViewSet, base_name= "login")
 router.register("userProfile", views.UserProfileViewSet)
 router.register("Person", views.PersonViewSet)
-
+router.register("TypeAction", views.TypeActionViewSet)
+router.register("action", views.ActionViewSet)
 
 urlpatterns = [
     url(r'', include(router.urls))

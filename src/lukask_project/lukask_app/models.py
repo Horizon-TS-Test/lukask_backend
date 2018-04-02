@@ -266,19 +266,26 @@ class Publication(models.Model):
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_pl")
 
 # TABLA DE TIPO DE ACCION
-class TypeAccion(models.Model):
+class TypeAction(models.Model):
     """
     Permite la administracion de tipos de acciones que se realizara sobre una determinada
     notificacion.
     """
-    id_tipo_accion      =   models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False)
-    description_acction =   models.CharField(max_length=75)
+    id_type_action      =   models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False)
+    description_action =   models.CharField(max_length=75)
     date_register       =   models.DateTimeField(auto_created=True)
     date_update         =   models.DateTimeField()
     active              =   models.BooleanField(default=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_ta")
 
+
+def __unicode__(self):
+    """
+    DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
+    :return:
+    """
+    return self.description_action
 
 # TABLA SERVICIOS BASICOS
 class ActionNotification(models.Model):
@@ -292,7 +299,9 @@ class ActionNotification(models.Model):
     active                  =   models.BooleanField(default=True)
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
-    tipo_accion             =   models.ForeignKey(TypeAccion, on_delete= models.CASCADE)
+    type_action             =   models.ForeignKey(TypeAction, on_delete= models.CASCADE, null=True, related_name = "typeA")
+
+
 
 
 # TABLA MULTIMEDIA

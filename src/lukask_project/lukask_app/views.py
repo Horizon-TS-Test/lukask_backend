@@ -59,3 +59,27 @@ class LoginViewSet(viewsets.ViewSet):
         return ObtainAuthToken().post(request)
 
 
+
+class TypeActionViewSet(viewsets.ModelViewSet):
+    """
+    HANDLES CREATING, READING AND UPDATING TODOS.
+    """
+    serializer_class = serializers.ProfileSerializer
+    queryset = models.TypeAction.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_action')
+
+    authentication_classes = (TokenAuthentication,)
+
+
+
+class ActionViewSet(viewsets.ModelViewSet):
+    """
+    HANDLES CREATING, READING AND UPDATING TODOS.
+    """
+    serializer_class = serializers.ProfileSerializer
+    queryset = models.ActionNotification.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    #search_fields = ('description_action')
+
+    authentication_classes = (TokenAuthentication,)

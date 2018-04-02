@@ -12,7 +12,7 @@ admin.site.register(models.TypePublication)
 admin.site.register(models.Tracing)
 admin.site.register(models.Activity)
 admin.site.register(models.Publication)
-admin.site.register(models.TypeAccion)
+admin.site.register(models.TypeAction)
 admin.site.register(models.ActionNotification)
 admin.site.register(models.Multimedia)
 
