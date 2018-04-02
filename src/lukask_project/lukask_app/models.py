@@ -112,7 +112,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     date_joined =  models.DateTimeField()
-    person = models.OneToOneField('person', related_name='persons', on_delete=models.CASCADE, null=True)
+    person = models.OneToOneField('person', on_delete=models.CASCADE, null=True)
 
     objects = UserProfileManager()
 
@@ -271,20 +271,20 @@ class TypeAction(models.Model):
     Permite la administracion de tipos de acciones que se realizara sobre una determinada
     notificacion.
     """
-    id_type_action 		= models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False, unique=True)
-    description_action  =   models.CharField(max_length=75)
+    id_type_action = models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False, unique=True)
+    description_action =   models.CharField(max_length=75)
     date_register       =   models.DateTimeField(auto_created=True)
     date_update         =   models.DateTimeField()
     active              =   models.BooleanField(default=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_ta")
 
-    def __unicode__(self):
+
+    def __str__(self):
         """
-        DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
-        :return:
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
         """
-        return '%s' % (self.description_action)
+        return self.description_action
 
 # TABLA SERVICIOS BASICOS
 class ActionNotification(models.Model):
