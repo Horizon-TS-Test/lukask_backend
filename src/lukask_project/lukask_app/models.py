@@ -94,7 +94,7 @@ class Profile(models.Model):
     id_profile= models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
+    date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
     user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_register_pf")
     user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pf")
@@ -112,7 +112,7 @@ class ProfileUser(models.Model):
     """
     date_login = models.DateTimeField()
     date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
+    date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -130,12 +130,17 @@ class PriorityPublication(models.Model):
     id_priority_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
+    date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
     user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null = True, related_name="user_update_pp")
 
 
+    def __str__(self):
+        """
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
+        """
+        return self.description
 
 # TABLE TYPE PUBLICATIONS
 
@@ -148,11 +153,17 @@ class TypePublication(models.Model):
     id_type_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
+    date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null = True, related_name="user_update_tp")
 
+
+    def __str__(self):
+        """
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
+        """
+        return self.description
 
 # TABLE TRACING
 class Tracing(models.Model):
@@ -168,13 +179,18 @@ class Tracing(models.Model):
     estimated_end_date = models.DateTimeField()
     real_end_date = models.DateTimeField()
     date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
+    date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
-
+    publication = models.ForeignKey('publication', on_delete=models.CASCADE, null=True)  # FK TABLE ACTIVITY
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null = True, related_name="user_update_tc")
 
 
+    def __str__(self):
+        """
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
+        """
+        return '%d %s' % (self.percentage_avance, self.date_start.strftime('%d-%m-%Y'))
 
 # TABLE ACTIVITY
 
@@ -192,13 +208,19 @@ class Activity(models.Model):
     estimated_end_date = models.DateTimeField()
     real_end_date = models.DateTimeField()
     date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
+    date_update = models.DateTimeField(null=True, blank=True)
     published = models.BooleanField(default=True)
     active = models.BooleanField(default=True)
     tracing = models.ForeignKey('tracing', on_delete=models.CASCADE) # FK TABLE TRACING
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE)
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_at")
 
+
+    def __str__(self):
+        """
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
+        """
+        return self.description_activity
 
 # TABLE PUBLICATIONS
 
@@ -215,14 +237,22 @@ class Publication(models.Model):
     detail = models.TextField(max_length= 300)
     date_publication = models.DateTimeField()
     date_register = models.DateTimeField(auto_now_add=True)
-    date_update = models.DateTimeField()
+    date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
     priority_publication = models.ForeignKey('priorityPublication', on_delete=models.CASCADE) # FK TABLE PRIORITY_PUBLICATION
     type_publication = models.ForeignKey('typePublication', on_delete=models.CASCADE) # FK TABLE TYPE_PUBLICATION
-    activity = models.ForeignKey('activity', on_delete=models.CASCADE)  # FK TABLE ACTIVITY
-    tracing = models.ForeignKey('tracing', on_delete=models.CASCADE)  # FK TABLE ACTIVITY
+    activity = models.ForeignKey('activity', on_delete=models.CASCADE, null=True)  # FK TABLE ACTIVITY
+
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE,  null=True)
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_pl")
+
+
+    def __str__(self):
+        """
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
+        """
+        return '%s %d %d' % (self.detail, self.latitude, self.length)
+
 
 # TABLA DE TIPO DE ACCION
 class TypeAction(models.Model):
@@ -233,7 +263,7 @@ class TypeAction(models.Model):
     id_type_action = models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False, unique=True)
     description_action =   models.CharField(max_length=75)
     date_register       =   models.DateTimeField(auto_created=True)
-    date_update         =   models.DateTimeField()
+    date_update         =   models.DateTimeField(null=True, blank=True)
     active              =   models.BooleanField(default=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_ta")
@@ -253,12 +283,12 @@ class ActionNotification(models.Model):
     """
     id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False, unique=True)
     date_register           =   models.DateTimeField(auto_created=True)
-    date_update             =   models.DateTimeField()
+    date_update             =   models.DateTimeField(null=True, blank=True)
     active                  =   models.BooleanField(default=True)
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
-    type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=False)
-
+    type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=True)
+    publication = models.ForeignKey(Publication, on_delete=models.CASCADE, null=True)
 
 
 
@@ -283,7 +313,8 @@ class Multimedia(models.Model):
     description_file    =   models.CharField(max_length=50)
     path_file           =   models.TextField(max_length=200)
     date_register       =   models.DateTimeField(auto_created=True)
-    date_update         =   models.DateTimeField()
+    date_update         =   models.DateTimeField(null=True, blank=True)
     active              =   models.BooleanField(default=True)
+    publication = models.ForeignKey('publication', on_delete=models.CASCADE, null=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_mul")
