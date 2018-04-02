@@ -94,6 +94,13 @@ class Person(models.Model):
         """
         return self.name
 
+    def __unicode__(self):
+        """
+        DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
+        :return:
+        """
+        return self.identification_card
+
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     """
     REPRESENT A "USER PROFILE" INSIDE OUR APP.

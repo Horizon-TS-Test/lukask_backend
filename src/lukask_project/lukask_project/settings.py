@@ -25,7 +25,7 @@ SECRET_KEY = '8$y=e+2*@5!zz3*67u(t9iub+1ug&&3t!7o12#0=j!1r-^akq)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.56']
 
 
 # Application definition
@@ -39,11 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'lukask_app',
     'rest_framework',
-    'rest_framework.authtoken',
-    'corsheaders',
-    'channels',
-    'channels_api',
-    'tornado_websockets',
+    'rest_framework.authtoken'
+    #'corsheaders',
+    #'channels',
+    #'channels_api',
+    #'tornado_websockets',
 ]
 
 MIDDLEWARE = [
@@ -172,6 +172,23 @@ CHANNEL_LAYERS = {
         }
     },
 }
+
+
+# -------------------------CHANNELS CONFIG:------------------------------
+CHANNEL_LAYERS = {
+    "default": {
+        # "BACKEND": "asgiref.inmemory.ChannelLayer", # USING DAPHNE CHANNEL LAYER FOR DEVELOPMENT
+        "BACKEND": "asgi_redis.RedisChannelLayer",  # USING REDIS CHANNEL LAYER FOR PRODUCTION
+        "ROUTING": "channels_api_proj.routing.channel_routing",
+        "CONFIG": {
+            # USING DOMAIN NAME IN PRODUCTION:
+            # "hosts": [("redis-channel-1", 6379), ("redis-channel-2", 6379)]
+            # USING LOCALHOST IN DEVELOPMENT:
+            "hosts": [("localhost", 6379)]
+        }
+    },
+}
+
 
 # CHANNELS API CONFIG:
 CHANNELS_API = {

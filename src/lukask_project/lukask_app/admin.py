@@ -4,7 +4,6 @@ from . import models
 # Register your models here.
 admin.site.register(models.UserProfile)
 
-admin.site.register(models.UserProfile)
 admin.site.register(models.Person)
 admin.site.register(models.Profile)
 admin.site.register(models.ProfileUser)

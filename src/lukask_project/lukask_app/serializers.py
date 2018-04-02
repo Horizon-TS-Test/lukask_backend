@@ -6,10 +6,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     A SERIALIZER FOR OUR USER PROFILE OBJECTS.
     """
+    person = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = models.UserProfile
-        fields = ('id', 'email', 'name', 'password', 'cedula')
+        fields = ('id', 'email','person')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
