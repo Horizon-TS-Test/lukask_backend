@@ -6,11 +6,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     A SERIALIZER FOR OUR USER PROFILE OBJECTS.
     """
-    person = serializers.StringRelatedField(many=True)
+    persons = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = models.UserProfile
-        fields = ('id', 'email','person')
+        fields = ('id', 'email', 'persons')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -20,6 +20,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         user = models.UserProfile(
             email=validated_data['email'],
             name=validated_data['name'],
+            person= validated_data['person']
         )
 
         user.set_password(validated_data['password'])
@@ -115,11 +116,11 @@ class PublicationSerializer(serializers.ModelSerializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
-    #typeA = serializers.StringRelatedField(many=True)
+    typea = serializers.StringRelatedField(many=True)
     class Meta:
         model = models.ActionNotification
         fields = ('id_action_notification', 'date_register', 'date_update', 'active', 'user_register',
-                  'user_update', 'type_action')
+                  'user_update', 'typea')
 
 
 class MultimediaSerializer(serializers.ModelSerializer):

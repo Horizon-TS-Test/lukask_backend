@@ -64,7 +64,7 @@ class TypeActionViewSet(viewsets.ModelViewSet):
     """
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
-    serializer_class = serializers.ProfileSerializer
+    serializer_class = serializers.TypeActionSerializer
     queryset = models.TypeAction.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_action')
@@ -77,7 +77,7 @@ class ActionViewSet(viewsets.ModelViewSet):
     """
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
-    serializer_class = serializers.ProfileSerializer
+    serializer_class = serializers.ActionSerializer
     queryset = models.ActionNotification.objects.all()
     filter_backends = (filters.SearchFilter,)
     #search_fields = ('description_action')

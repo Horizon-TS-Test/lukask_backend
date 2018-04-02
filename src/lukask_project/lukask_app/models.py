@@ -112,7 +112,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     date_joined =  models.DateTimeField()
-    person = models.OneToOneField('person', on_delete=models.CASCADE, null=True)
+    person = models.OneToOneField('person', related_name='persons', on_delete=models.CASCADE, null=True)
 
     objects = UserProfileManager()
 
@@ -279,13 +279,12 @@ class TypeAction(models.Model):
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_ta")
 
-
-def __unicode__(self):
-    """
-    DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
-    :return:
-    """
-    return self.description_action
+    def __unicode__(self):
+        """
+        DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
+        :return:
+        """
+        return self.description_action
 
 # TABLA SERVICIOS BASICOS
 class ActionNotification(models.Model):
@@ -299,7 +298,7 @@ class ActionNotification(models.Model):
     active                  =   models.BooleanField(default=True)
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
-    type_action             =   models.ForeignKey(TypeAction, on_delete= models.CASCADE, null=True, related_name = "typeA")
+    type_action             =   models.ForeignKey(TypeAction, on_delete= models.CASCADE, null=True, related_name = "typea")
 
 
 
