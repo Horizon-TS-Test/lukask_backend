@@ -52,12 +52,20 @@ class PersonSerializer(serializers.ModelSerializer):
 
 
 
-class Profile(serializers.ModelSerializer):
+class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         models = models.Profile
         fields = ('id_profile', 'description', 'date_register', 'date_update',
-                  'active', 'user_register', 'user_update', 'users')
+                  'active', 'user_register', 'user_update')
 
+
+class PriorityPublicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        models = models.PriorityPublication
+        fields = ('id_priority_publication', 'description', 'date_register',
+                  'date_update', 'active', 'user_register', 'user_update')
+
+#class TypePublicationSerializer()
 
 
 
