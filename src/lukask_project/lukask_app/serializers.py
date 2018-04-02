@@ -115,7 +115,6 @@ class PublicationSerializer(serializers.ModelSerializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
-    #typeA = serializers.StringRelatedField(many=True)
     class Meta:
         model = models.ActionNotification
         fields = ('id_action_notification', 'date_register', 'date_update', 'active', 'user_register',

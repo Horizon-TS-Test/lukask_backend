@@ -280,12 +280,11 @@ class TypeAction(models.Model):
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_ta")
 
 
-    def __unicode__(self):
+    def __str__(self):
         """
-        DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
-        :return:
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
         """
-        return '%s' % (self.description_action)
+        return self.description_action
 
 # TABLA SERVICIOS BASICOS
 class ActionNotification(models.Model):
