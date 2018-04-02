@@ -6,11 +6,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     A SERIALIZER FOR OUR USER PROFILE OBJECTS.
     """
-    person = serializers.StringRelatedField(many=True)
+    #person = serializers.StringRelatedField(many=True)
 
     class Meta:
         model = models.UserProfile
-        fields = ('id', 'email','person')
+        fields = ('id','email', 'password', 'person')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -18,8 +18,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         CREATE AND RETURN A NEW USER.
         """
         user = models.UserProfile(
-            email=validated_data['email'],
-            name=validated_data['name'],
+            email= validated_data['email'],
+            person= validated_data['person']
         )
 
         user.set_password(validated_data['password'])
@@ -32,6 +32,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         UPDATE AND RETURN A USER.
         """
         instance.name = validated_data.get('name', instance.name)
+        instance.person = validated_data.get('person', instance.person)
         instance.set_password(validated_data.get('password', instance.password))
         instance.save()
 
