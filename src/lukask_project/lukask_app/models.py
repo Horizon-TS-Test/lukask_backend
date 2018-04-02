@@ -71,7 +71,7 @@ class Person(models.Model):
     Campos: id_persona, edad, cedula, nombre, apellido, telefono, direccion,
     fecha_registro, usuario_registro, fecha_actualizacion,  usuario_actualizacion, activo
     """
-    id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     age = models.IntegerField()
     identification_card = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
@@ -132,7 +132,7 @@ class Profile(models.Model):
      Campos: id_perfil, descripcion, fecha_registro, fecha_actualizacion,
       activo, usuario_registro,  usuario_actualizacion
      """
-    id_profile= models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id_profile= models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField()
@@ -168,7 +168,7 @@ class PriorityPublication(models.Model):
     Campos: id_prioridad_publicacion, descripcion, fecha_registro, fecha_actualizacion, activo
      usuario_registro, usuario_actualizacion
      """
-    id_priority_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id_priority_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField()
@@ -186,7 +186,7 @@ class TypePublication(models.Model):
     Campos: id_tipo_publicacion, descripcion, fecha_registro, fecha_actualizacion
     usuario_registro, activo,  usuario_actualizacion
     """
-    id_type_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id_type_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField()
@@ -203,7 +203,7 @@ class Tracing(models.Model):
     fecha_registro, fecha_actualizacion, activo, usuario_registro,
     usuario_registro, usuario_actualizacion
     """
-    id_tracing = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id_tracing = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     percentage_avance = models.FloatField()
     date_start = models.DateTimeField()
     estimated_end_date = models.DateTimeField()
@@ -226,7 +226,7 @@ class Activity(models.Model):
      fecha_registro, fecha_actualizacion, publicado, activo, seguimiento,
      usuario_registro, usuario_actualizacion
        """
-    id_activity = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id_activity = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     description_activity = models.CharField(max_length=75)
     estimated_start_date = models.DateTimeField()
     real_start_date =  models.DateTimeField()
@@ -250,7 +250,7 @@ class Publication(models.Model):
     fecha_registro, fecha_actualizacion, activo,  prioridad_publicacion, tipo_publicacion, seguimiento,
      usuario_registro, usuario_actualizacion
     """
-    id_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False)
+    id_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
     latitude = models.FloatField()
     length = models.FloatField()
     detail = models.TextField(max_length= 300)
@@ -271,7 +271,7 @@ class TypeAction(models.Model):
     Permite la administracion de tipos de acciones que se realizara sobre una determinada
     notificacion.
     """
-    id_type_action      =   models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False)
+    id_type_action = models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False, unique=True)
     description_action =   models.CharField(max_length=75)
     date_register       =   models.DateTimeField(auto_created=True)
     date_update         =   models.DateTimeField()
@@ -280,12 +280,12 @@ class TypeAction(models.Model):
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_ta")
 
 
-def __unicode__(self):
-    """
-    DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
-    :return:
-    """
-    return self.description_action
+    def __unicode__(self):
+        """
+        DEVULVE EL IDENTIFICAR O CL DE LA PERSONA
+        :return:
+        """
+        return '%s' % (self.description_action)
 
 # TABLA SERVICIOS BASICOS
 class ActionNotification(models.Model):
@@ -293,13 +293,13 @@ class ActionNotification(models.Model):
     Permite gestionar las acciones que se realizan sobre una notificacion, Ejemplo:
     Me intersa, Compartir, etiquetar, recomendat, etc.
     """
-    id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False)
+    id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False, unique=True)
     date_register           =   models.DateTimeField(auto_created=True)
     date_update             =   models.DateTimeField()
     active                  =   models.BooleanField(default=True)
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
-    type_action             =   models.ForeignKey(TypeAction, on_delete= models.CASCADE, null=True, related_name = "typeA")
+    type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=False)
 
 
 
