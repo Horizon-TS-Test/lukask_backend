@@ -2,15 +2,29 @@ from rest_framework import serializers
 
 from . import models
 
+class PersonSerializer(serializers.ModelSerializer):
+    """
+    A SERIALIZER FOR TODO MODEL
+    """
+    # UNCOMMENT NEXT LINE IF DOMAIN URL IS NOT NEEDED:
+    # prod_image = serializers.ImageField(use_url=False)
+
+    class Meta:
+        model = models.Person
+        fields = ('id_person', 'age', 'identification_card', 'name',
+                  'last_name', 'telephone', 'address', 'active')
+
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """
     A SERIALIZER FOR OUR USER PROFILE OBJECTS.
     """
-    #person = serializers.StringRelatedField(many=True)
-
+    person = PersonSerializer(read_only=True)
+    personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
     class Meta:
         model = models.UserProfile
-        fields = ('id','email', 'password', 'person')
+        fields = ('id','email', 'password', 'person', 'personSelect')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -37,21 +51,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
-
-
-class PersonSerializer(serializers.ModelSerializer):
-    """
-    A SERIALIZER FOR TODO MODEL
-    """
-    # UNCOMMENT NEXT LINE IF DOMAIN URL IS NOT NEEDED:
-    # prod_image = serializers.ImageField(use_url=False)
-
-    class Meta:
-        model = models.Person
-        fields = ('id_person', 'age', 'identification_card', 'name',
-                  'last_name', 'telephone', 'address', 'active')
-
-
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:

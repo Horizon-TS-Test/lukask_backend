@@ -71,7 +71,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
-    person = models.OneToOneField('person', on_delete=models.CASCADE, null=True)
+    person = models.OneToOneField('person', related_name='userProfiles', on_delete=models.CASCADE, null=True)
 
     #objects = UserProfileManager()
 
