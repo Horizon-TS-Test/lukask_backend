@@ -82,6 +82,7 @@ class TypePublicationSerializer(serializers.ModelSerializer):
 
 
 class TypeActionSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = models.TypeAction
         fields = ('id_type_action', 'description_action', 'date_register',
@@ -115,10 +116,28 @@ class PublicationSerializer(serializers.ModelSerializer):
 
 
 class ActionSerializer(serializers.ModelSerializer):
+    type_action = TypeActionSerializer(read_only=True)
+    typeactionSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.TypeAction.objects.all(), source='type_action')
+    publication = PublicationSerializer(read_only=True)
+    publicationSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Publication.objects.all(), source='publication')
+
     class Meta:
         model = models.ActionNotification
         fields = ('id_action_notification', 'date_register', 'date_update', 'active', 'user_register',
-                  'user_update', 'type_action', 'publication')
+                  'user_update', 'type_action', 'publication', 'typeactionSelect', 'publicationSelect')
+
+
+        def create(self, validated_data):
+            """
+            CREATE AND RETURN A NEW USER.
+            """
+            user = models.ActionNotification(
+
+            )
+
+            user.save()
+
+            return user
 
 
 class MultimediaSerializer(serializers.ModelSerializer):
