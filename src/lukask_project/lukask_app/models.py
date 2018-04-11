@@ -14,7 +14,47 @@ from django.contrib.auth.models import PermissionsMixin
 # MANAGER CLASS TO HANDLE ALL MODELS:
 from pip.cmdoptions import editable
 
+class UserProfileManager(BaseUserManager):
+    """
+    HELPS DJANGO WORK WITH UR CUSTOM USER MODEL.
+    """
 
+    def create_user(self, email, person, password=None):
+        """
+        CREATES A NEW USER PROFILE OBJECTS
+        """
+
+        if not email:
+            raise ValueError('Users must have an email address.')
+
+        # CONVERTS EVERY EMAIL CHARACTER TO LOWERCASE:
+        # REF: https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.models.BaseUserManager.normalize_email
+        email = self.normalize_email(email)
+        #
+
+        user = self.model(email=email, person = person)
+
+        # NEXT FUNCTIONS WILL ENCRYPT PASSWORD FOR US, RETURNING A HASH TO BE
+        # STORED IN OUR DATABASE:
+        user.set_password(password)
+        #
+        user.save(using=self._db)
+
+        return user
+
+    def create_superuser(self, email, password, person):
+        """
+        CREATES AND SAVES A NEW SUPERUSER WITH GIVEN DETAILS:
+        """
+
+        user = self.create_user(email, password, person)
+
+        user.is_superuser = True
+        user.is_staff = True
+
+        user.save(using=self._db)
+
+        return user
 
 
 
@@ -73,7 +113,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     date_register = models.DateTimeField(auto_now_add=True)
     person = models.OneToOneField('person', related_name='userProfiles', on_delete=models.CASCADE, null=True)
 
-    #objects = UserProfileManager()
+    objects = UserProfileManager()
 
     USERNAME_FIELD = 'email'  # EMAIL IS REQUIRED BY DEFAULT
 
