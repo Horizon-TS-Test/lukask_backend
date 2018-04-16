@@ -7,6 +7,8 @@ from rest_framework import filters
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.parsers import MultiPartParser, FormParser
+
 """from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView"""
@@ -150,6 +152,7 @@ class MultimediaViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.MultimediaSerializer
     queryset = models.Multimedia.objects.all()
     filter_backends = (filters.SearchFilter,)
+    parser_classes = (MultiPartParser, FormParser,)
     search_fields = ('description_file')
 
     authentication_classes = (TokenAuthentication,)

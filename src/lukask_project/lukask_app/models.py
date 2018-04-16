@@ -301,8 +301,8 @@ class TypeAction(models.Model):
     notificacion.
     """
     id_type_action = models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False, unique=True)
-    description_action =   models.CharField(max_length=75)
-    date_register       =   models.DateTimeField(auto_created=True)
+    description_action  =   models.CharField(max_length=75)
+    date_register       =   models.DateTimeField(auto_now_add = True)
     date_update         =   models.DateTimeField(null=True, blank=True)
     active              =   models.BooleanField(default=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
@@ -322,7 +322,7 @@ class ActionNotification(models.Model):
     Me intersa, Compartir, etiquetar, recomendat, etc.
     """
     id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False, unique=True)
-    date_register           =   models.DateTimeField(auto_created=True)
+    date_register           =   models.DateTimeField(auto_now_add = True)
     date_update             =   models.DateTimeField(null=True, blank=True)
     active                  =   models.BooleanField(default=True)
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
@@ -352,10 +352,10 @@ class Multimedia(models.Model):
     id_multimedia       =   models.UUIDField(primary_key=True, default=uuid.uuid4(), editable = False)
     name_file           =   models.CharField(max_length=50)
     description_file    =   models.CharField(max_length=50)
-    path_file           =   models.TextField(max_length=200)
-    date_register       =   models.DateTimeField(auto_created=True)
+    media_file          =   models.ImageField(upload_to='medios', default='default.png')
+    date_register       =   models.DateTimeField(auto_now_add = True)
     date_update         =   models.DateTimeField(null=True, blank=True)
     active              =   models.BooleanField(default=True)
-    publication = models.ForeignKey('publication', on_delete=models.CASCADE, null=True)
+    publication         =   models.ForeignKey('publication', related_name='medios', on_delete=models.CASCADE, null=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_mul")

@@ -105,13 +105,19 @@ class ActivitySerializer(serializers.ModelSerializer):
               'estimated_end_date', 'real_end_date', 'date_register', 'date_update', 'published',
               'active', 'tracing', 'user_register', 'user_update')
 
+class MultimediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Multimedia
+        fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file', 'date_register',
+                  'date_update', 'active', 'publication', 'user_register', 'user_update')
 
 class PublicationSerializer(serializers.ModelSerializer):
+   medios = MultimediaSerializer(many=True)
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'date_publication', 'date_register',
                 'date_update', 'active', 'priority_publication', 'type_publication', 'activity',
-                'user_register', 'user_update')
+                'user_register', 'user_update', 'medios')
 
 
 
@@ -140,8 +146,4 @@ class ActionSerializer(serializers.ModelSerializer):
             return user
 
 
-class MultimediaSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Multimedia
-        fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'path_file', 'date_register',
-                  'date_update', 'active', 'publication', 'user_register', 'user_update')
+
