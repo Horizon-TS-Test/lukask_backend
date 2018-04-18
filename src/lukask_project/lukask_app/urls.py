@@ -14,11 +14,13 @@ router.register("publication", views.PublicationViewSet)
 router.register("tracing", views.TracingViewSet)
 router.register("activity", views.ActivityViewSet)
 router.register("multimedia", views.MultimediaViewSet)
+#router.register(r'crearPublicacion', views.PublicationCreateAPIView, base_name='create')
 
 
 
 urlpatterns = [
-    url(r'', include(router.urls))
+    url(r'', include(router.urls)),
     #url(r"^prototype/$", views.PrototypeApiView.as_view()),
     #url(r"^prototype/(?P<user_id>[^/.]+)/$", views.PrototypeApiView.as_view())
+    url(r"^crear_publicacion", views.PublicationCreateAPIView.as_view(), name="crear_publicacion"),
 ]

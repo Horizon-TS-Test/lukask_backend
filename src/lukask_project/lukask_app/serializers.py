@@ -109,15 +109,22 @@ class MultimediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Multimedia
         fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file', 'date_register',
-                  'date_update', 'active', 'publication', 'user_register', 'user_update')
+                  'date_update', 'active', 'user_register', 'user_update')
 
 class PublicationSerializer(serializers.ModelSerializer):
-   medios = MultimediaSerializer(many=True)
+   medios_data = MultimediaSerializer(write_only=True)
+   medios = MultimediaSerializer(read_only=True, many=True)
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'date_publication', 'date_register',
                 'date_update', 'active', 'priority_publication', 'type_publication', 'activity',
-                'user_register', 'user_update', 'medios')
+                'user_register', 'user_update', 'medios','medios_data')
+
+   def create(self, validated_data):
+        media_data = validated_data.pop('medios_data')
+        publication_info = models.Publication.objects.create(**validated_data)
+        models.Multimedia.objects.create(publication = publication_info, **media_data)
+        return publication_info
 
 
 
