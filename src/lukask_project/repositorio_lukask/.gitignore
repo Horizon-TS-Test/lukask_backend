@@ -1,2 +1,4 @@
 #omitimos las imagenes subidas en cada una de las  maquinas clientes del repositorio.
 medios
+#omitimos las imagenes de los perfiles de los usuarios.
+medios_profile

@@ -111,8 +111,8 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
-    person = models.OneToOneField('person', related_name='userProfiles', on_delete=models.CASCADE, null=True)
-
+    person = models.OneToOneField('person', related_name='userProfile', on_delete=models.CASCADE, null=True)
+    media_profile =  models.ImageField(upload_to='medios_profile', default='default_profile.png')
     objects = UserProfileManager()
 
     USERNAME_FIELD = 'email'  # EMAIL IS REQUIRED BY DEFAULT
@@ -352,7 +352,7 @@ class Multimedia(models.Model):
     id_multimedia       =   models.UUIDField(primary_key=True, default=uuid.uuid4(), editable = False)
     name_file           =   models.CharField(max_length=50)
     description_file    =   models.CharField(max_length=50)
-    media_file          =   models.ImageField(upload_to='medios', default='default.png')
+    media_file          =   models.ImageField(upload_to='medios', default='default.jpg')
     date_register       =   models.DateTimeField(auto_now_add = True)
     date_update         =   models.DateTimeField(null=True, blank=True)
     active              =   models.BooleanField(default=True)

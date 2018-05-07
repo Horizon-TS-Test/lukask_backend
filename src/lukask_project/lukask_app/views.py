@@ -2,14 +2,21 @@
 from django.shortcuts import render"""
 
 # Create your views here.
+from django.http import Http404
 from rest_framework import viewsets, status,generics
 from rest_framework import filters
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import GenericViewSet
 from rest_framework.mixins import CreateModelMixin
+from rest_framework.response import Response
+from rest_framework.views import  APIView
+
+
+from . import permissions
 
 """from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -24,11 +31,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = serializers.UserProfileSerializer
-    ##permission_classes = (permissions.UdateOwnProfile, IsAuthenticated)
-
+    permission_classes = (permissions.UpdateOwnProfile, IsAuthenticated)
     queryset = models.UserProfile.objects.all()
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('name', 'email')
+    search_fields = ('email',)
 
     authentication_classes = (TokenAuthentication,)
 
@@ -43,7 +49,7 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     queryset = models.Person.objects.all()
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('identification_card', 'name', 'last_name')
+    search_fields = ('identification_card', 'name', 'last_name',)
 
     authentication_classes = (TokenAuthentication,)
 
@@ -106,7 +112,7 @@ class TypePublicationViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TypePublicationSerializer
     queryset = models.TypePublication.objects.all()
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('description')
+    search_fields = ('description',)
 
     authentication_classes = (TokenAuthentication,)
 
@@ -138,13 +144,20 @@ class ActivityViewSet(viewsets.ModelViewSet):
 class PublicationViewSet(viewsets.ModelViewSet):
     """"
     HANDLES CREATING, READING AND UPDATING TODOS.
-        """
+    """
     serializer_class = serializers.PublicationSerializer
     queryset = models.Publication.objects.all()
+    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('detail')
-
+    search_fields = ('detail',)
     authentication_classes = (TokenAuthentication,)
+
+    def get_user_register(self, pk):
+        try:
+            return models.UserProfile.objects.get(pk=pk)
+        except models.UserProfile.DoesNotExist:
+            raise Http404
+
 
 
 class MultimediaViewSet(viewsets.ModelViewSet):
@@ -159,6 +172,13 @@ class MultimediaViewSet(viewsets.ModelViewSet):
 
     authentication_classes = (TokenAuthentication,)
 
-class PublicationCreateAPIView(generics.CreateAPIView):
-    model = models.Publication
-    serializer_class = serializers.PublicationSerializer
+class MultimediSingleAPIView(viewsets.ModelViewSet):
+    """
+    view para gestion de imagenes
+    """
+    serializer_class = serializers.MultimediaSingleSerializer
+    queryset = models.Multimedia.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    parser_classes = (MultiPartParser, FormParser,)
+    search_fields = ('description_file')
+

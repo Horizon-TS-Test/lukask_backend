@@ -24,7 +24,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
     class Meta:
         model = models.UserProfile
-        fields = ('id','email', 'password', 'person', 'personSelect')
+        fields = ('id','email', 'password', 'person', 'personSelect', 'media_profile')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -33,7 +33,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """
         user = models.UserProfile(
             email= validated_data['email'],
-            person= validated_data['person']
+            person= validated_data['person'],
+            media_profile = validated_data['media_profile']
         )
 
         user.set_password(validated_data['password'])
@@ -45,8 +46,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """
         UPDATE AND RETURN A USER.
         """
-        instance.name = validated_data.get('name', instance.name)
+        print ("datos_imagen: ", instance.media_profile)
+        print ("datos_password: ", instance.password)
+        instance.email = validated_data.get('email', instance.email)
         instance.person = validated_data.get('person', instance.person)
+        instance.media_profile = validated_data.get('media_profile', instance.media_profile)
         instance.set_password(validated_data.get('password', instance.password))
         instance.save()
 
@@ -111,14 +115,27 @@ class MultimediaSerializer(serializers.ModelSerializer):
         fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file', 'date_register',
                   'date_update', 'active', 'user_register', 'user_update')
 
+class MultimediaSingleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Multimedia
+        fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file', 'date_register',
+                  'date_update', 'active', 'publication', 'user_register', 'user_update')
+
 class PublicationSerializer(serializers.ModelSerializer):
    medios_data = MultimediaSerializer(write_only=True)
    medios = MultimediaSerializer(read_only=True, many=True)
+   user_name = serializers.CharField(read_only=True, source="user_register.person.name")
+   user_lastname = serializers.CharField(read_only=True, source="user_register.person.last_name")
+   user_email = serializers.CharField(read_only=True, source="user_register.email")
+   media_profile = serializers.ImageField(read_only=True, source="user_register.media_profile")
+   priority_publication_detail = serializers.CharField(read_only=True, source="priority_publication.description")
+   type_publication_detail = serializers.CharField(read_only=True, source="type_publication.description")
+
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'date_publication', 'date_register',
-                'date_update', 'active', 'priority_publication', 'type_publication', 'activity',
-                'user_register', 'user_update', 'medios','medios_data')
+                'date_update', 'active', 'priority_publication_detail', 'type_publication_detail', 'activity',
+                'user_register', 'user_update', 'medios','medios_data', "user_name", "user_lastname", "user_email", "media_profile")
 
    def create(self, validated_data):
         media_data = validated_data.pop('medios_data')
