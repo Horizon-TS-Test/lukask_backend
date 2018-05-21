@@ -1,18 +1,40 @@
+"""
+DOCUMENTACIÓN DE ESTE MÓDULO.
+El presente script contiene información sobre los modelos de la base de datos para la aplicación LUKASK.
+por medio de este escript se puede gestionar el modelo físico de la DB para la creacion, modificación e eliminación
+de tablas, hay que tomar en cuenta reglas de diseño de DB relacional para al momento del modelamiento de la db ya que
+el modelo se creara tomando en cuenta cardinalidad sin garantizar que el proceso de migración se lo realize correctamente
+segun su diseño si no se ha definido bien los modelos de acuerdo a las reglas de DRF para persistencia de datos, para evitar incovenientes
+se recomienda leer la documentación de modelos para DRF.
+"""
+
+__author__      = "Dennys Ivan Moyón Gunsha"
+__copyright__   = "Copyreight 2018, Horizon Technology Solutions"
+__credits__     = ["Horizon Tecnology Solutions", "Dennys Moyón", "Patricia Allauca"]
+__license__     = "GPL"
+__version__     = "0.1.0"
+__maintainer__  = "Consultores HTS"
+__email__       = "dmoyon@horizon-ts.com"
+__status__      = "Develop"
+
 from django.db import models
-
-import uuid
-import django
-
 # FOR AUTHENTICATION:
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
 # PERMISSIONS FOR SPECIFIC USERS TO LET THEM TO DO SOMETHING:
 from django.contrib.auth.models import PermissionsMixin
+import uuid
 
 # Create your models here.
-
 # MANAGER CLASS TO HANDLE ALL MODELS:
-from pip.cmdoptions import editable
+
+
+def make_id_model():
+    """
+    Permite Generar UUID para los registros de la DB.
+    :return: uuid clava unica para registro de la DB
+    """
+    return uuid.uuid4()
 
 class UserProfileManager(BaseUserManager):
     """
@@ -30,30 +52,22 @@ class UserProfileManager(BaseUserManager):
         # CONVERTS EVERY EMAIL CHARACTER TO LOWERCASE:
         # REF: https://docs.djangoproject.com/en/1.11/topics/auth/customizing/#django.contrib.auth.models.BaseUserManager.normalize_email
         email = self.normalize_email(email)
-        #
-
         user = self.model(email=email, person = person)
 
         # NEXT FUNCTIONS WILL ENCRYPT PASSWORD FOR US, RETURNING A HASH TO BE
         # STORED IN OUR DATABASE:
         user.set_password(password)
-        #
         user.save(using=self._db)
-
         return user
 
     def create_superuser(self, email, password, person):
         """
         CREATES AND SAVES A NEW SUPERUSER WITH GIVEN DETAILS:
         """
-
         user = self.create_user(email, password, person)
-
         user.is_superuser = True
         user.is_staff = True
-
         user.save(using=self._db)
-
         return user
 
 
@@ -62,15 +76,11 @@ class UserProfileManager(BaseUserManager):
 #--------------------------------------------------------------------------------------#
 #---------------DEFINICION DE MODELOS DE BASE DE DATOS PARA APLICACION LUKASK----------#
 #--------------------------------------------------------------------------------------#
-
-    # TABLE PERSON
 class Person(models.Model):
     """
-    Este modelo permite gestionar la informacion de personas
-    Campos: id_persona, edad, cedula, nombre, apellido, telefono, direccion,
-    fecha_registro, usuario_registro, fecha_actualizacion,  usuario_actualizacion, activo
+    MODELO PERSON QUE REPRESENTA A LA TABLA lukask_app_person EN LA DB.
     """
-    id_person = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+    id_person = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     age = models.IntegerField()
     identification_card = models.CharField(max_length=10)
     name = models.CharField(max_length=50)
@@ -100,9 +110,12 @@ class Person(models.Model):
         """
         return '%s: %s' % (self.name, self.identification_card)
 
+
+
+
 class UserProfile(AbstractBaseUser, PermissionsMixin):
     """
-    REPRESENT A "USER PROFILE" INSIDE OUR APP.
+    MODELO USERPROFILE REPRESENTA A LA TABLA lukask_app_userprofile DE LA DB LUKASK_DB
     """
 
     # DJANGO MODELS REF: https://docs.djangoproject.com/en/1.11/topics/db/models/
@@ -117,21 +130,21 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'  # EMAIL IS REQUIRED BY DEFAULT
 
-
     def __str__(self):
         """
         DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
         """
         return self.email
 
- # TABLE PROFILE
+
+
+
 class Profile(models.Model):
     """
-     Este modelo permite gestionar los perfiles
-     Campos: id_perfil, descripcion, fecha_registro, fecha_actualizacion,
-      activo, usuario_registro,  usuario_actualizacion
-     """
-    id_profile= models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+    MODELOS PROFILE QUE REPRESENTA A LA TABLA lukask_app_profile  EN LA DB lukask_db
+    """
+
+    id_profile= models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
@@ -143,13 +156,14 @@ class Profile(models.Model):
                     through='ProfileUser',
                     through_fields=('profile', 'user'))
 
-# TABLE USER PROFILE n-n
+
+
+
 class ProfileUser(models.Model):
     """
-     Este modelo permite gestionar los perfiles de los usuarios
-     Campos: fecha_login, fecha_registro, fecha_actualizacion
-     activo, usuario, perfil, usuario_registro, usuario_actualizacion
+    MODELO PROFILEUSER REPRESENTA A LA TABLA lukask_app_profileuser DE LA DB LUKASK_DB
     """
+
     date_login = models.DateTimeField()
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
@@ -160,14 +174,14 @@ class ProfileUser(models.Model):
     user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null = True, related_name = "user_update_pu")
 
 
-# TABLE PRIORITY PUBLICATIONS
+
+
 class PriorityPublication(models.Model):
     """
-    Este modelo permite gestionar la prioridad que tiene cada una de las publicaciones de los usuarios
-    Campos: id_prioridad_publicacion, descripcion, fecha_registro, fecha_actualizacion, activo
-     usuario_registro, usuario_actualizacion
-     """
-    id_priority_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+    MODELO PRIORITYPUBLICATION REPRESENTA A LA TABLA lukask_app_prioritypublication DE LA DB LUKASK_DB
+    """
+
+    id_priority_publication = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
@@ -182,15 +196,15 @@ class PriorityPublication(models.Model):
         """
         return self.description
 
-# TABLE TYPE PUBLICATIONS
+
+
 
 class TypePublication(models.Model):
     """
-    Permite gestionar los tipos de publicaciones
-    Campos: id_tipo_publicacion, descripcion, fecha_registro, fecha_actualizacion
-    usuario_registro, activo,  usuario_actualizacion
+    MODELO TYPEPUBLICATION QUE REPRESENTA A LA TABLA lukask_app_typepublication DE LA DB LUKASK_DB
     """
-    id_type_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+
+    id_type_publication = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     description = models.CharField(max_length=75)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
@@ -205,15 +219,15 @@ class TypePublication(models.Model):
         """
         return self.description
 
-# TABLE TRACING
+
+
+
 class Tracing(models.Model):
     """
-    Permite gestionar el seguimiento de las publicaciones realizadas por los usuarios
-    Campos: id_seguimiento, porcentaje de avance, fecha_inicio, fecha_fin_estimada, fecha_fin_real,
-    fecha_registro, fecha_actualizacion, activo, usuario_registro,
-    usuario_registro, usuario_actualizacion
+    MODELO TRACING QUE REPRESENTA A LA TABLA lukask_app_tracing DE LA BASE DB LUKASK_DB
     """
-    id_tracing = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+
+    id_tracing = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     percentage_avance = models.FloatField()
     date_start = models.DateTimeField()
     estimated_end_date = models.DateTimeField()
@@ -230,18 +244,17 @@ class Tracing(models.Model):
         """
         DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
         """
-        return '%d %s' % (self.percentage_avance, self.date_start.strftime('%d-%m-%Y'))
+        return '%f %s' % (self.percentage_avance, self.date_start.strftime('%d-%m-%Y'))
 
-# TABLE ACTIVITY
+
+
 
 class Activity(models.Model):
     """
-     Permite gestionar el seguimiento de las publicaciones realizadas por los usuarios
-     Campos: id_actividad, descripcion, fecha_inicio_estimada, fecha_fin_real, fecha_fin_estimada, fecha_fin_real,
-     fecha_registro, fecha_actualizacion, publicado, activo, seguimiento,
-     usuario_registro, usuario_actualizacion
-       """
-    id_activity = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+    MODELO ACTIVITY QUE REPRESENTA A LA TABLA lukask_app_activity DE LA DB LUKASK_DB
+    """
+
+    id_activity = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     description_activity = models.CharField(max_length=75)
     estimated_start_date = models.DateTimeField()
     real_start_date =  models.DateTimeField()
@@ -262,45 +275,47 @@ class Activity(models.Model):
         """
         return self.description_activity
 
-# TABLE PUBLICATIONS
+
+
 
 class Publication(models.Model):
     """
-    Este modelo permite gestionar las publicaciones que realicen los usuarios
-    Campos: id_publicacion, latitud, longitud,  detalle, fecha_publicacion,
-    fecha_registro, fecha_actualizacion, activo,  prioridad_publicacion, tipo_publicacion, seguimiento,
-     usuario_registro, usuario_actualizacion
+    MODELO PUBLICATION QUE REPRESENTA A LA TABLA lukask_app_publication DE LA DB LUKASK_DB
     """
-    id_publication = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+
+    id_publication = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     latitude = models.FloatField()
     length = models.FloatField()
     detail = models.TextField(max_length= 300)
-    date_publication = models.DateTimeField()
+    date_publication = models.DateTimeField(null=True)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
-    priority_publication = models.ForeignKey('priorityPublication', on_delete=models.CASCADE) # FK TABLE PRIORITY_PUBLICATION
-    type_publication = models.ForeignKey('typePublication', on_delete=models.CASCADE) # FK TABLE TYPE_PUBLICATION
+    priority_publication = models.ForeignKey('priorityPublication', on_delete=models.CASCADE, null = True) # FK TABLE PRIORITY_PUBLICATION
+    type_publication = models.ForeignKey('typePublication', on_delete=models.CASCADE, null=True) # FK TABLE TYPE_PUBLICATION
     activity = models.ForeignKey('activity', on_delete=models.CASCADE, null=True)  # FK TABLE ACTIVITY
 
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE,  null=True)
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_pl")
 
-
     def __str__(self):
         """
         DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
         """
-        return '%s %d %d' % (self.detail, self.latitude, self.length)
+        return '%s %f %f' % (self.detail, self.latitude, self.length)
+
+    def set_user_register(self, user_register):
+        self.user_register = user_register
 
 
-# TABLA DE TIPO DE ACCION
+
+
 class TypeAction(models.Model):
     """
-    Permite la administracion de tipos de acciones que se realizara sobre una determinada
-    notificacion.
+    MODELO TYPEACTION QUE REPRESENTA A LA TABLA lukask_app_typeaction DE LA DB LUKASK_DB
     """
-    id_type_action = models.UUIDField(primary_key= True, default=uuid.uuid4(), editable= False, unique=True)
+
+    id_type_action = models.UUIDField(primary_key= True, default=make_id_model, editable= False, unique=True)
     description_action  =   models.CharField(max_length=75)
     date_register       =   models.DateTimeField(auto_now_add = True)
     date_update         =   models.DateTimeField(null=True, blank=True)
@@ -315,14 +330,16 @@ class TypeAction(models.Model):
         """
         return self.description_action
 
-# TABLA SERVICIOS BASICOS
+
+
+
 class ActionNotification(models.Model):
     """
-    Permite gestionar las acciones que se realizan sobre una notificacion, Ejemplo:
-    Me intersa, Compartir, etiquetar, recomendat, etc.
+    MODELO ACTIONNOTIFICATION QUE REPRESENTA A LA TABLA lukak_app_actionnotification  DE LA DB LUKASK_DB
     """
-    id_action_notification  =   models.UUIDField(primary_key = True, default=uuid.uuid4(), editable = False, unique=True)
-    date_register           =   models.DateTimeField(auto_now_add = True)
+
+    id_action_notification  =   models.UUIDField(primary_key = True, default=make_id_model, editable = False, unique=True)
+    date_register           =   models.DateTimeField(auto_now_add = True,null=True)
     date_update             =   models.DateTimeField(null=True, blank=True)
     active                  =   models.BooleanField(default=True)
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
@@ -333,11 +350,11 @@ class ActionNotification(models.Model):
 
 
 
-# TABLA MULTIMEDIA
 class Multimedia(models.Model):
     """
-    Se encarga de almacenar los archivos multimeria de publicacion.
+    MODELO MULTIMEDIA QUE REPRESENTA A LA TABLA  lukask_app_multimedia DE LA DB LUKASK_DB
     """
+
     audio = 'AD'
     video = 'VD'
     image = 'IG'
@@ -349,9 +366,9 @@ class Multimedia(models.Model):
         (file, 'FILE')
     )
     format_multimedia   =   models.CharField(max_length=2, choices= format_multimedia_choices, default = image)
-    id_multimedia       =   models.UUIDField(primary_key=True, default=uuid.uuid4(), editable = False)
+    id_multimedia       =   models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable = False)
     name_file           =   models.CharField(max_length=50)
-    description_file    =   models.CharField(max_length=50)
+    description_file    =   models.CharField(null=True, max_length=50)
     media_file          =   models.ImageField(upload_to='medios', default='default.jpg')
     date_register       =   models.DateTimeField(auto_now_add = True)
     date_update         =   models.DateTimeField(null=True, blank=True)
@@ -359,3 +376,5 @@ class Multimedia(models.Model):
     publication         =   models.ForeignKey('publication', related_name='medios', on_delete=models.CASCADE, null=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_mul")
+
+

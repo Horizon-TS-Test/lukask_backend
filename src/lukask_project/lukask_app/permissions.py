@@ -27,7 +27,6 @@ class UserProfilePublication(permissions.BasePermission):
         """
         print ('Login_User: {}'.format(request.user))
         user_register = view.get_user_register(request.user.id)
-
         return user_register.id == request.user.id
 
     def has_object_permission(self, request, view, obj):

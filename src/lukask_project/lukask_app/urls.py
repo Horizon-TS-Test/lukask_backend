@@ -14,7 +14,7 @@ router.register("publication", views.PublicationViewSet)
 router.register("tracing", views.TracingViewSet)
 router.register("activity", views.ActivityViewSet)
 router.register("multimedia", views.MultimediaViewSet)
-router.register("singleMultimedia", views.MultimediSingleAPIView)
+#router.register("singleMultimedia", views.MultimediaSingleAPIView)
 #router.register(r'crearPublicacion', views.PublicationCreateAPIView, base_name='create')
 
 
@@ -24,5 +24,5 @@ urlpatterns = [
     #url(r"^prototype/$", views.PrototypeApiView.as_view()),
     #url(r"^prototype/(?P<user_id>[^/.]+)/$", views.PrototypeApiView.as_view())
     #url(r"^gestion_media/(?P<pk>[^/.]+)/$", views.MultimediSingleAPIView.as_view(), name="gestionMedia"),
-    #url(r"^gestion_media", views.MultimediSingleAPIView.as_view(), name="gestionMedia"),
+    url(r"^gestion_media", views.MultimediaSingleAPIView.as_view(), name="gestionMedia"),
 ]

@@ -39,10 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'lukask_app',
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
     #'corsheaders',
-    #'channels',
-    #'channels_api',
+    'channels',
+    'channels_api'
     #'tornado_websockets',
 ]
 
@@ -165,7 +165,7 @@ CHANNEL_LAYERS = {
     "default": {
         # "BACKEND": "asgiref.inmemory.ChannelLayer", # USING DAPHNE CHANNEL LAYER FOR DEVELOPMENT
         "BACKEND": "asgi_redis.RedisChannelLayer",  # USING REDIS CHANNEL LAYER FOR PRODUCTION
-        "ROUTING": "channels_api_proj.routing.channel_routing",
+        "ROUTING": "lukask_project.routing.channel_routing",
         "CONFIG": {
             # USING DOMAIN NAME IN PRODUCTION:
             # "hosts": [("redis-channel-1", 6379), ("redis-channel-2", 6379)]
@@ -174,23 +174,6 @@ CHANNEL_LAYERS = {
         }
     },
 }
-
-
-# -------------------------CHANNELS CONFIG:------------------------------
-CHANNEL_LAYERS = {
-    "default": {
-        # "BACKEND": "asgiref.inmemory.ChannelLayer", # USING DAPHNE CHANNEL LAYER FOR DEVELOPMENT
-        "BACKEND": "asgi_redis.RedisChannelLayer",  # USING REDIS CHANNEL LAYER FOR PRODUCTION
-        "ROUTING": "channels_api_proj.routing.channel_routing",
-        "CONFIG": {
-            # USING DOMAIN NAME IN PRODUCTION:
-            # "hosts": [("redis-channel-1", 6379), ("redis-channel-2", 6379)]
-            # USING LOCALHOST IN DEVELOPMENT:
-            "hosts": [("localhost", 6379)]
-        }
-    },
-}
-
 
 # CHANNELS API CONFIG:
 CHANNELS_API = {
