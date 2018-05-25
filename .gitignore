@@ -109,5 +109,3 @@ ubuntu-xenial-16.04-cloudimg-console.log
 # Omitimos proyecto de repaso
 repaso_project
 
-#datos de maquinas virtuales.
-Vagrantfile

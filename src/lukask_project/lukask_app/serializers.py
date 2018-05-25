@@ -47,11 +47,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """
         UPDATE AND RETURN A USER.
         """
-        print ("datos_imagen: ", instance.media_profile)
-        print ("datos_password: ", instance.password)
-        instance.email = validated_data.get('email', instance.email)
-        instance.person = validated_data.get('person', instance.person)
-        instance.media_profile = validated_data.get('media_profile', instance.media_profile)
+        instance.email          = validated_data.get('email', instance.email)
+        instance.person         = validated_data.get('person', instance.person)
+        instance.media_profile  = validated_data.get('media_profile', instance.media_profile)
         instance.set_password(validated_data.get('password', instance.password))
         instance.save()
 
@@ -76,6 +74,7 @@ class ProfileUserSerializer(serializers.ModelSerializer):
         model = models.ProfileUser
         fields = ('date_login', 'date_register', 'date_update', 'active', 'user',
                   'profile', 'user_register', 'user_update')
+
 
 
 class PriorityPublicationSerializer(serializers.ModelSerializer):
@@ -108,7 +107,7 @@ class TypeActionSerializer(serializers.ModelSerializer):
         model = models.TypeAction
         fields = ('id_type_action', 'description_action', 'date_register',
                   'date_update', 'active', 'user_register', 'user_update')
-
+        read_only_fields = ('user_register','data_register')
 
 
 
@@ -140,12 +139,11 @@ class MultimediaSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZADORA SIMPLE PARA EL OBJETO MULTIMEDIA CRUD
     """
-    user_update = UserProfileSerializer(read_only=True)
-    date_update_d = serializers.DateTimeField(read_only=True, source="date_update")
     class Meta:
         model = models.Multimedia
         fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file',
-                  'date_register', 'date_update_d', 'active', 'user_update')
+                  'date_register', 'date_update', 'active', 'user_update', 'user_register')
+        read_only_fields = ('user_register',)
 
 
 
@@ -155,26 +153,38 @@ class MultimediaSingleSerializer(serializers.ModelSerializer):
     CLASE SERIALIZADORA COMPUESTA PARA EL OBJECTO MULTIMEDIA CRUD
     """
 
-    latitude = serializers.FloatField(write_only=True, source="publication.latitude")
-    length = serializers.FloatField(write_only=True, source="publication.length")
-    detail = serializers.CharField(write_only=True, source="publication.detail")
-    date_publication = serializers.DateTimeField(write_only = True, source="publication.date_publication")
-    type_publication = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.TypePublication.objects.all(), source='publication.type_publication')
-    priority_publication = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.PriorityPublication.objects.all(), source='publication.priority_publication')
-    user_register_id = serializers.IntegerField(read_only=True, source="user_register.id")
-
+    #latitude = serializers.FloatField(write_only=True, source="publication.latitude")
+    #length = serializers.FloatField(write_only=True, source="publication.length")
+    #detail = serializers.CharField(write_only=True, source="publication.detail")
+    #date_publication = serializers.DateTimeField(write_only = True, source="publication.date_publication")
+    #type_publication = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.TypePublication.objects.all(), source='publication.type_publication')
+    #priority_publication = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.PriorityPublication.objects.all(), source='publication.priority_publication')
+    #user_register_id = serializers.IntegerField(read_only=True, source="user_register.id")
+    multimedia = MultimediaSerializer(write_only=True, many=True)
     class Meta:
         model = models.Multimedia
-        fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file', 'date_register',
-                  'date_update', 'active','user_update', 'latitude', 'length', 'detail', 'date_publication','type_publication',
-                  'priority_publication', 'user_register_id')
+        fields = ('publication', 'id_multimedia', 'format_multimedia', 'name_file', 'media_file','multimedia')
+        read_only_fields = ('format_multimedia', 'id_multimedia', 'name_file', 'media_file')
 
     def create(self, validated_data):
         """
-        El metodo permite ingresar una publicacion con su los datos del archivo multimedia.
+        Proceso para adicionar imagenes a la publicacion
         :param validated_data:
-        :return: new_multimedia retorna el objeto multimedia ingresado.
+        :return:
         """
+        _publication = validated_data.pop('publication')
+        _medios  = validated_data.pop('multimedia')
+        _user_register = validated_data.pop('user_register')
+        _medio = None
+        if _medios is not None:
+            for medio in _medios:
+                _medio = models.Multimedia.objects.create(publication = _publication, user_register = _user_register, **medio)
+        return _medio
+
+
+
+    """def create(self, validated_data):
+        
         publication_data = validated_data.pop('publication')
         user_register = validated_data.get('user_register')
         publication = models.Publication(
@@ -204,13 +214,13 @@ class MultimediaSingleSerializer(serializers.ModelSerializer):
             date_register=datetime.datetime.now()
         )
         new_multimedia.save()
-        return new_multimedia
+        return new_multimedia"""
 
 
-    def update(self, instance, validated_data):
+    """def update(self, instance, validated_data):
             instance.user_update = validated_data.get("user_update")
             instance.save()
-            return  instance
+            return  instance"""
 
 
 
@@ -228,7 +238,7 @@ class PublicationSerializer(serializers.ModelSerializer):
    media_profile = serializers.ImageField(read_only=True, source="user_register.media_profile")
    priority_publication_detail = serializers.CharField(read_only=True, source="priority_publication.description")
    type_publication_detail = serializers.CharField(read_only=True, source="type_publication.description")
-   user_update = UserProfileSerializer(read_only=True, many=True)
+   user_update = UserProfileSerializer(read_only=True)
 
    class Meta:
       model = models.Publication
@@ -248,6 +258,22 @@ class PublicationSerializer(serializers.ModelSerializer):
         return publication_info
 
 
+   def update(self, instance, validated_data):
+        instance.user_update    = validated_data.get("user_update", instance.user_update)
+        instance.latitude       = validated_data.get("latitude", instance.latitude)
+        instance.length         = validated_data.get("length", instance.length)
+        instance.detail         = validated_data.get("detail", instance.detail)
+        instance.date_publication = validated_data.get("date_publication", instance.date_publication)
+        instance.date_update    = validated_data.get("date_update", instance.date_update)
+        instance.active         = validated_data.get("active", instance.active)
+        instance.priority_publication = validated_data.get("priority_publication", instance.priority_publication)
+        instance.type_publication = validated_data.get("type_publication", instance.type_publication)
+        instance.activity = validated_data.get("activity", instance.activity)
+        instance.save()
+        return instance
+
+
+
 
 
 class ActionSerializer(serializers.ModelSerializer):
@@ -255,16 +281,11 @@ class ActionSerializer(serializers.ModelSerializer):
     CLASE SERIALIZADORA PARA EL OBJECTO ACTION sCRUD
     """
 
-    type_action = TypeActionSerializer(read_only=True)
-    typeactionSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.TypeAction.objects.all(), source='type_action')
-    publication = PublicationSerializer(read_only=True)
-    publicationSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Publication.objects.all(), source='publication')
-
     class Meta:
         model = models.ActionNotification
-        fields = ('id_action_notification', 'date_register', 'date_update', 'user_register',
-                  'user_update', 'type_action', 'publication', 'typeactionSelect', 'publicationSelect', 'active')
-
+        fields = ('id_action_notification', 'description', 'date_register', 'date_update', 'user_register','user_update', 'type_action',
+                  'publication','accion_padre','active')
+        read_only_fields = ('user_register', 'date_register')
 
 
 

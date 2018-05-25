@@ -35,11 +35,9 @@ class PersonViewSet(viewsets.ModelViewSet):
 
     serializer_class = serializers.PersonSerializer
     ##permission_classes = (permissions.UdateOwnProfile, IsAuthenticated)
-
     queryset = models.Person.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('identification_card', 'name', 'last_name',)
-
     authentication_classes = (TokenAuthentication,)
 
 
@@ -67,8 +65,10 @@ class TypeActionViewSet(viewsets.ModelViewSet):
     queryset = models.TypeAction.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_action')
-
     authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializer.save(user_register = self.request.user)
 
 
 
@@ -79,8 +79,7 @@ class ActionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ActionSerializer
     queryset = models.ActionNotification.objects.all()
     filter_backends = (filters.SearchFilter,)
-    #search_fields = ('description_action')
-
+    search_fields = ('description_action')
     authentication_classes = (TokenAuthentication,)
 
 class PriorityPublicationViewSet(viewsets.ModelViewSet):
@@ -155,22 +154,27 @@ class PublicationViewSet(viewsets.ModelViewSet):
             print (Http404.message)
             raise Http404
 
+    def perform_update(self, serializer):
+        try:
+            serializer.save(user_update = self.request.user)
+        except UnreadablePostError:
+            raise Http404
 
 class MultimediaViewSet(viewsets.ModelViewSet):
     """"
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
-    serializer_class = serializers.MultimediaSerializer()
+    serializer_class = serializers.MultimediaSerializer
     queryset = models.Multimedia.objects.all()
     filter_backends = (filters.SearchFilter,)
     parser_classes = (MultiPartParser, FormParser,)
-    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     search_fields = ('description_file')
+    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
         """
-        Creación de medios
+        Creacion de medios
         :param serializer:
         :return:
         """
@@ -204,6 +208,7 @@ class MultimediaSingleAPIView(generics.ListCreateAPIView):
     authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
+        print("serializers", serializer)
         serializer.save(user_register = self.request.user)
 
     def get_user_register(self, pk):
