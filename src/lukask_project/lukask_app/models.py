@@ -341,13 +341,16 @@ class ActionNotification(models.Model):
     id_action_notification  =   models.UUIDField(primary_key = True, default=make_id_model, editable = False, unique=True)
     date_register           =   models.DateTimeField(auto_now_add = True,null=True)
     date_update             =   models.DateTimeField(null=True, blank=True)
+    description             =   models.CharField(max_length=500, null=True)
     active                  =   models.BooleanField(default=True)
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
     type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=True)
-    publication = models.ForeignKey(Publication, on_delete=models.CASCADE, null=True)
+    publication             =   models.ForeignKey(Publication, on_delete=models.CASCADE, null=True)
+    accion_padre            =   models.ForeignKey('self', null=True)
 
-
+    def __str__(self):
+        return self
 
 
 class Multimedia(models.Model):
