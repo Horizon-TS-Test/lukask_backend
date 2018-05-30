@@ -139,9 +139,10 @@ class MultimediaSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZADORA SIMPLE PARA EL OBJETO MULTIMEDIA CRUD
     """
+    id_publication = serializers.UUIDField(read_only=True, source='publication.id_publication')
     class Meta:
         model = models.Multimedia
-        fields = ('format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file',
+        fields = ('id_publication','format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file',
                   'date_register', 'date_update', 'active', 'user_update', 'user_register')
         read_only_fields = ('user_register',)
 
