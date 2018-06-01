@@ -153,7 +153,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     parser_classes = (MultiPartParser, FormParser,)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('detail',)
+    search_fields = ('detail', 'location')
     authentication_classes = (TokenAuthentication,)
 
     def get_user_register(self, pk):

@@ -286,6 +286,7 @@ class Publication(models.Model):
     id_publication = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     latitude = models.FloatField()
     length = models.FloatField()
+    location = models.CharField(max_length=60, null=True)
     detail = models.TextField(max_length= 300)
     date_publication = models.DateTimeField(null=True)
     date_register = models.DateTimeField(auto_now_add=True)
