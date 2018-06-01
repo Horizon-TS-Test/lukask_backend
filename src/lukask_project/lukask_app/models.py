@@ -286,6 +286,7 @@ class Publication(models.Model):
     id_publication = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
     latitude = models.FloatField()
     length = models.FloatField()
+    location = models.CharField(max_length=60, null=True)
     detail = models.TextField(max_length= 300)
     date_publication = models.DateTimeField(null=True)
     date_register = models.DateTimeField(auto_now_add=True)
@@ -339,18 +340,19 @@ class ActionNotification(models.Model):
     """
 
     id_action_notification  =   models.UUIDField(primary_key = True, default=make_id_model, editable = False, unique=True)
-    date_register           =   models.DateTimeField(auto_now_add = True,null=True)
+    date_register           =   models.DateTimeField(auto_now_add = True, null=True)
     date_update             =   models.DateTimeField(null=True, blank=True)
     description             =   models.CharField(max_length=500, null=True)
     active                  =   models.BooleanField(default=True)
-    user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE,null=True)
+    user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
     type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=True)
     publication             =   models.ForeignKey(Publication, on_delete=models.CASCADE, null=True)
-    accion_padre            =   models.ForeignKey('self', null=True)
+    action_dad              =   models.ForeignKey('self', null=True)
+
 
     def __str__(self):
-        return self
+        return self.description
 
 
 class Multimedia(models.Model):
@@ -370,7 +372,7 @@ class Multimedia(models.Model):
     )
     format_multimedia   =   models.CharField(max_length=2, choices= format_multimedia_choices, default = image)
     id_multimedia       =   models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable = False)
-    name_file           =   models.CharField(max_length=50)
+    name_file           =   models.CharField(max_length=50, null=True)
     description_file    =   models.CharField(null=True, max_length=50)
     media_file          =   models.ImageField(upload_to='medios', default='default.jpg')
     date_register       =   models.DateTimeField(auto_now_add = True)
@@ -379,5 +381,6 @@ class Multimedia(models.Model):
     publication         =   models.ForeignKey('publication', related_name='medios', on_delete=models.CASCADE, null=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_mul")
+    actionPublication   =   models.ForeignKey('actionnotification', related_name='mediosactionPub', on_delete=models.CASCADE, null=True)
 
 
