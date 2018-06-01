@@ -13,6 +13,7 @@ from rest_framework.permissions import IsAuthenticated
 from . import permissions
 from . import serializers
 from . import models
+from .lukask_constants import LukaskConstants
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """
@@ -77,10 +78,24 @@ class ActionViewSet(viewsets.ModelViewSet):
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
     serializer_class = serializers.ActionSerializer
-    queryset = models.ActionNotification.objects.all()
+    queryset = models.ActionNotification.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_action')
+    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
+
+    def get_user_register(self, pk):
+        try:
+            return models.UserProfile.objects.get(pk=pk)
+        except models.UserProfile.DoesNotExist:
+            raise Http404
+
+    def perform_create(self, serializer):
+        try:
+            serializer.save(user_register = self.request.user)
+        except UnreadablePostError:
+            print (Http404.message)
+            raise Http404
 
 class PriorityPublicationViewSet(viewsets.ModelViewSet):
     """"
@@ -134,7 +149,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
     serializer_class = serializers.PublicationSerializer
-    queryset = models.Publication.objects.all().order_by('-date_publication')
+    queryset = models.Publication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_publication')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     parser_classes = (MultiPartParser, FormParser,)
     filter_backends = (filters.SearchFilter,)
@@ -165,7 +180,7 @@ class MultimediaViewSet(viewsets.ModelViewSet):
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
     serializer_class = serializers.MultimediaSerializer
-    queryset = models.Multimedia.objects.all()
+    queryset = models.Multimedia.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
     filter_backends = (filters.SearchFilter,)
     parser_classes = (MultiPartParser, FormParser,)
     search_fields = ('description_file')
@@ -200,7 +215,7 @@ class MultimediaSingleAPIView(generics.ListCreateAPIView):
     view para gestion de imagenes
     """
     serializer_class = serializers.MultimediaSingleSerializer
-    queryset = models.Multimedia.objects.all()
+    queryset = models.Multimedia.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
     filter_backends = (filters.SearchFilter,)
     parser_classes = (MultiPartParser, FormParser,)
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)

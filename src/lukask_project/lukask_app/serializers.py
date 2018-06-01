@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .lukask_constants import LukaskConstants
 import datetime
 
 from . import models
@@ -143,8 +144,8 @@ class MultimediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Multimedia
         fields = ('id_publication','format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file',
-                  'date_register', 'date_update', 'active', 'user_update', 'user_register')
-        read_only_fields = ('user_register',)
+                  'date_register', 'date_update', 'active', 'user_update', 'user_register', 'actionPublication')
+        read_only_fields = ('user_register', 'actionPublication', )
 
 
 
@@ -192,7 +193,7 @@ class MultimediaSingleSerializer(serializers.ModelSerializer):
             latitude = publication_data['latitude'],
             length = publication_data['length'],
             detail = publication_data['detail'],
-            active = True,
+            active = LukaskConstants.LOGICAL_STATE_ACTIVE,
             date_publication =  publication_data['date_publication'],
             type_publication = publication_data['type_publication'],
             priority_publication = publication_data['priority_publication'],
@@ -281,12 +282,34 @@ class ActionSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZADORA PARA EL OBJECTO ACTION sCRUD
     """
+    name_file = serializers.CharField(write_only=True, source="multimedia.name_file", required=False)
+    format_multimedia = serializers.CharField(write_only=True, source="multimedia.format_multimedia", required=False)
+    media_file = serializers.FileField(write_only=True, source="multimedia.media_file", required=False)
+    mediosactionPub = MultimediaSerializer(read_only=True, many=True)
 
     class Meta:
         model = models.ActionNotification
-        fields = ('id_action_notification', 'description', 'date_register', 'date_update', 'user_register','user_update', 'type_action',
-                  'publication','accion_padre','active')
-        read_only_fields = ('user_register', 'date_register')
+        fields = ('id_action_notification', 'description', 'date_register', 'date_update', 'user_update', 'user_register', 'type_action',
+                  'publication','action_dad', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file')
+        read_only_fields = ('date_register', 'user_register',)
+
+
+    def create(self, validated_data):
+        """
+
+        :param validated_data:
+        :return:
+        """
+        _user_register = validated_data.get('user_register')
+        _multimedia_publication = validated_data.pop('multimedia', None)
+        _action_publication = models.ActionNotification.objects.create(**validated_data)
+        if _multimedia_publication is not None:
+            models.Multimedia.objects.create(actionPublication = _action_publication, user_register = _user_register, **_multimedia_publication)
+        return _action_publication
+
+
+
+
 
 
 
