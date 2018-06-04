@@ -78,7 +78,7 @@ class ActionViewSet(viewsets.ModelViewSet):
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
     serializer_class = serializers.ActionSerializer
-    queryset = models.ActionNotification.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    queryset = models.ActionPublication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_action')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
