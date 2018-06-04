@@ -1,11 +1,11 @@
 """
-DOCUMENTACIÓN DE ESTE MÓDULO.
-El presente script contiene información sobre los modelos de la base de datos para la aplicación LUKASK.
-por medio de este escript se puede gestionar el modelo físico de la DB para la creacion, modificación e eliminación
-de tablas, hay que tomar en cuenta reglas de diseño de DB relacional para al momento del modelamiento de la db ya que
-el modelo se creara tomando en cuenta cardinalidad sin garantizar que el proceso de migración se lo realize correctamente
-segun su diseño si no se ha definido bien los modelos de acuerdo a las reglas de DRF para persistencia de datos, para evitar incovenientes
-se recomienda leer la documentación de modelos para DRF.
+DOCUMENTACION DE ESTE MODULO.
+El presente script contiene informacion sobre los modelos de la base de datos para la aplicacion LUKASK.
+por medio de este escript se puede gestionar el modelo fisico de la DB para la creacion, modificacion e eliminacion
+de tablas, hay que tomar en cuenta reglas de disenio de DB relacional para al momento del modelamiento de la db ya que
+el modelo se creara tomando en cuenta cardinalidad sin garantizar que el proceso de migracion se lo realize correctamente
+segun su disenio si no se ha definido bien los modelos de acuerdo a las reglas de DRF para persistencia de datos, para evitar incovenientes
+se recomienda leer la documentacion de modelos para DRF.
 """
 
 __author__      = "Dennys Ivan Moyón Gunsha"
