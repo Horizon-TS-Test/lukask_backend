@@ -289,9 +289,9 @@ class ActionSerializer(serializers.ModelSerializer):
     mediosactionPub = MultimediaSerializer(read_only=True, many=True)
 
     class Meta:
-        model = models.ActionNotification
-        fields = ('id_action_notification', 'description', 'date_register', 'date_update', 'user_update', 'user_register', 'type_action',
-                  'publication','action_dad', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file')
+        model = models.ActionPublication
+        fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'user_register', 'type_action',
+                  'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file')
         read_only_fields = ('date_register', 'user_register',)
 
 
@@ -303,7 +303,7 @@ class ActionSerializer(serializers.ModelSerializer):
         """
         _user_register = validated_data.get('user_register')
         _multimedia_publication = validated_data.pop('multimedia', None)
-        _action_publication = models.ActionNotification.objects.create(**validated_data)
+        _action_publication = models.ActionPublication.objects.create(**validated_data)
         if _multimedia_publication is not None:
             models.Multimedia.objects.create(actionPublication = _action_publication, user_register = _user_register, **_multimedia_publication)
         return _action_publication

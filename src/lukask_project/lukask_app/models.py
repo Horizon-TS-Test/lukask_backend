@@ -334,12 +334,12 @@ class TypeAction(models.Model):
 
 
 
-class ActionNotification(models.Model):
+class ActionPublication(models.Model):
     """
     MODELO ACTIONNOTIFICATION QUE REPRESENTA A LA TABLA lukak_app_actionnotification  DE LA DB LUKASK_DB
     """
 
-    id_action_notification  =   models.UUIDField(primary_key = True, default=make_id_model, editable = False, unique=True)
+    id_action               =   models.UUIDField(primary_key = True, default=make_id_model, editable = False, unique=True)
     date_register           =   models.DateTimeField(auto_now_add = True, null=True)
     date_update             =   models.DateTimeField(null=True, blank=True)
     description             =   models.CharField(max_length=500, null=True)
@@ -348,7 +348,7 @@ class ActionNotification(models.Model):
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
     type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=True)
     publication             =   models.ForeignKey(Publication, on_delete=models.CASCADE, null=True)
-    action_dad              =   models.ForeignKey('self', null=True)
+    action_parent           =   models.ForeignKey('self', null=True)
 
 
     def __str__(self):
@@ -381,6 +381,6 @@ class Multimedia(models.Model):
     publication         =   models.ForeignKey('publication', related_name='medios', on_delete=models.CASCADE, null=True)
     user_register       =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     user_update         =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_mul")
-    actionPublication   =   models.ForeignKey('actionnotification', related_name='mediosactionPub', on_delete=models.CASCADE, null=True)
+    actionPublication   =   models.ForeignKey('actionpublication', related_name='mediosactionPub', on_delete=models.CASCADE, null=True)
 
 
