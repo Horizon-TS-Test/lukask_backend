@@ -347,7 +347,7 @@ class ActionPublication(models.Model):
     user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
     type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=True)
-    publication             =   models.ForeignKey(Publication, on_delete=models.CASCADE, null=True)
+    publication             =   models.ForeignKey(Publication,  related_name='actionPublication', on_delete=models.CASCADE, null=True)
     action_parent           =   models.ForeignKey('self', null=True)
 
 

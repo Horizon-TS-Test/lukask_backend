@@ -86,6 +86,7 @@ class PriorityPublicationSerializer(serializers.ModelSerializer):
         model = models.PriorityPublication
         fields = ('id_priority_publication', 'description', 'date_register',
                   'date_update', 'active', 'user_register', 'user_update')
+        read_only_fields = ('user_register', 'active')
 
 
 
@@ -98,6 +99,7 @@ class TypePublicationSerializer(serializers.ModelSerializer):
         model = models.TypePublication
         fields = ('id_type_publication','description','date_register',
                   'date_update', 'active', 'user_register', 'user_update')
+        read_only_fields  = ('active', 'user_register')
 
 
 class TypeActionSerializer(serializers.ModelSerializer):
@@ -108,7 +110,7 @@ class TypeActionSerializer(serializers.ModelSerializer):
         model = models.TypeAction
         fields = ('id_type_action', 'description_action', 'date_register',
                   'date_update', 'active', 'user_register', 'user_update')
-        read_only_fields = ('user_register','data_register')
+        read_only_fields = ('user_register','data_register', 'active')
 
 
 
@@ -145,7 +147,7 @@ class MultimediaSerializer(serializers.ModelSerializer):
         model = models.Multimedia
         fields = ('id_publication','format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file',
                   'date_register', 'date_update', 'active', 'user_update', 'user_register', 'actionPublication')
-        read_only_fields = ('user_register', 'actionPublication', )
+        read_only_fields = ('user_register', 'actionPublication', 'active')
 
 
 
@@ -165,8 +167,8 @@ class MultimediaSingleSerializer(serializers.ModelSerializer):
     multimedia = MultimediaSerializer(write_only=True, many=True)
     class Meta:
         model = models.Multimedia
-        fields = ('publication', 'id_multimedia', 'format_multimedia', 'name_file', 'media_file','multimedia')
-        read_only_fields = ('format_multimedia', 'id_multimedia', 'name_file', 'media_file')
+        fields = ('publication', 'id_multimedia', 'format_multimedia', 'name_file', 'media_file','multimedia', 'active')
+        read_only_fields = ('format_multimedia', 'id_multimedia', 'name_file', 'media_file', 'active')
 
     def create(self, validated_data):
         """
@@ -226,6 +228,41 @@ class MultimediaSingleSerializer(serializers.ModelSerializer):
 
 
 
+class ActionSerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZADORA PARA EL OBJECTO ACTION sCRUD
+    """
+    name_file = serializers.CharField(write_only=True, source="multimedia.name_file", required=False)
+    format_multimedia = serializers.CharField(write_only=True, source="multimedia.format_multimedia", required=False)
+    media_file = serializers.FileField(write_only=True, source="multimedia.media_file", required=False)
+    mediosactionPub = MultimediaSerializer(read_only=True, many=True)
+    user_name = serializers.CharField(read_only=True, source="user_register.person.name")
+    user_lastname = serializers.CharField(read_only=True, source="user_register.person.last_name")
+    user_email = serializers.CharField(read_only=True, source="user_register.email")
+    media_profile = serializers.ImageField(read_only=True, source="user_register.media_profile")
+
+    class Meta:
+        model = models.ActionPublication
+        fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'user_register', 'type_action',
+                  'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
+                  'user_name', 'user_lastname', 'user_email', 'media_profile')
+        read_only_fields = ('date_register', 'user_register', 'active')
+
+
+    def create(self, validated_data):
+        """
+
+        :param validated_data:
+        :return:
+        """
+        _user_register = validated_data.get('user_register')
+        _multimedia_publication = validated_data.pop('multimedia', None)
+        _action_publication = models.ActionPublication.objects.create(**validated_data)
+        if _multimedia_publication is not None:
+            models.Multimedia.objects.create(actionPublication = _action_publication, user_register = _user_register, **_multimedia_publication)
+        return _action_publication
+
+
 
 class PublicationSerializer(serializers.ModelSerializer):
    """
@@ -241,13 +278,15 @@ class PublicationSerializer(serializers.ModelSerializer):
    priority_publication_detail = serializers.CharField(read_only=True, source="priority_publication.description")
    type_publication_detail = serializers.CharField(read_only=True, source="type_publication.description")
    user_update = UserProfileSerializer(read_only=True)
+   actionPublication = ActionSerializer(read_only=True, many=True)
 
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register',
                 'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active',
                 'type_publication_detail', 'activity', 'user_update', 'medios', 'user_name', 'user_lastname',
-                'user_email', 'media_profile', 'medios_data')
+                'user_email', 'media_profile', 'medios_data', 'actionPublication')
+      read_only_fields  = ('active', )
 
    def create(self, validated_data):
         medios = validated_data.pop('medios_data')
@@ -277,36 +316,6 @@ class PublicationSerializer(serializers.ModelSerializer):
 
 
 
-
-
-class ActionSerializer(serializers.ModelSerializer):
-    """
-    CLASE SERIALIZADORA PARA EL OBJECTO ACTION sCRUD
-    """
-    name_file = serializers.CharField(write_only=True, source="multimedia.name_file", required=False)
-    format_multimedia = serializers.CharField(write_only=True, source="multimedia.format_multimedia", required=False)
-    media_file = serializers.FileField(write_only=True, source="multimedia.media_file", required=False)
-    mediosactionPub = MultimediaSerializer(read_only=True, many=True)
-
-    class Meta:
-        model = models.ActionPublication
-        fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'user_register', 'type_action',
-                  'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file')
-        read_only_fields = ('date_register', 'user_register',)
-
-
-    def create(self, validated_data):
-        """
-
-        :param validated_data:
-        :return:
-        """
-        _user_register = validated_data.get('user_register')
-        _multimedia_publication = validated_data.pop('multimedia', None)
-        _action_publication = models.ActionPublication.objects.create(**validated_data)
-        if _multimedia_publication is not None:
-            models.Multimedia.objects.create(actionPublication = _action_publication, user_register = _user_register, **_multimedia_publication)
-        return _action_publication
 
 
 

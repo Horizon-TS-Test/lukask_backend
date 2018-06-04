@@ -69,7 +69,7 @@ class TypeActionViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
-        serializer.save(user_register = self.request.user)
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
 
 
@@ -92,7 +92,7 @@ class ActionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         try:
-            serializer.save(user_register = self.request.user)
+            serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
         except UnreadablePostError:
             print (Http404.message)
             raise Http404
@@ -108,6 +108,9 @@ class PriorityPublicationViewSet(viewsets.ModelViewSet):
 
     authentication_classes = (TokenAuthentication,)
 
+    def perform_create(self, serializer):
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+
 class TypePublicationViewSet(viewsets.ModelViewSet):
     """"
     HANDLES CREATING, READING AND UPDATING TODOS.
@@ -118,6 +121,9 @@ class TypePublicationViewSet(viewsets.ModelViewSet):
     search_fields = ('description',)
 
     authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
 
 class TracingViewSet(viewsets.ModelViewSet):
@@ -164,7 +170,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         try :
-            serializer.save(user_register = self.request.user)
+            serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
         except UnreadablePostError:
             print (Http404.message)
             raise Http404
@@ -193,7 +199,7 @@ class MultimediaViewSet(viewsets.ModelViewSet):
         :param serializer:
         :return:
         """
-        serializer.save(user_register = self.request.user)
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
     def perform_update(self, serializer):
         """
@@ -224,7 +230,7 @@ class MultimediaSingleAPIView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         print("serializers", serializer)
-        serializer.save(user_register = self.request.user)
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
     def get_user_register(self, pk):
         try:
