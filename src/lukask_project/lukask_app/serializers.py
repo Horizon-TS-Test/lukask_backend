@@ -236,16 +236,13 @@ class ActionSerializer(serializers.ModelSerializer):
     format_multimedia = serializers.CharField(write_only=True, source="multimedia.format_multimedia", required=False)
     media_file = serializers.FileField(write_only=True, source="multimedia.media_file", required=False)
     mediosactionPub = MultimediaSerializer(read_only=True, many=True)
-    user_name = serializers.CharField(read_only=True, source="user_register.person.name")
-    user_lastname = serializers.CharField(read_only=True, source="user_register.person.last_name")
-    user_email = serializers.CharField(read_only=True, source="user_register.email")
-    media_profile = serializers.ImageField(read_only=True, source="user_register.media_profile")
+    user_register = UserProfileSerializer(read_only=True)
 
     class Meta:
         model = models.ActionPublication
-        fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'user_register', 'type_action',
+        fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'type_action',
                   'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
-                  'user_name', 'user_lastname', 'user_email', 'media_profile')
+                  'user_register')
         read_only_fields = ('date_register', 'user_register', 'active')
 
 
@@ -271,21 +268,17 @@ class PublicationSerializer(serializers.ModelSerializer):
 
    medios_data = MultimediaSerializer(write_only=True, many=True, required=True)
    medios = MultimediaSerializer(read_only=True, many=True)
-   user_name = serializers.CharField(read_only=True, source="user_register.person.name")
-   user_lastname = serializers.CharField(read_only=True, source="user_register.person.last_name")
-   user_email = serializers.CharField(read_only=True, source="user_register.email")
-   media_profile = serializers.ImageField(read_only=True, source="user_register.media_profile")
    priority_publication_detail = serializers.CharField(read_only=True, source="priority_publication.description")
    type_publication_detail = serializers.CharField(read_only=True, source="type_publication.description")
    user_update = UserProfileSerializer(read_only=True)
    actionPublication = ActionSerializer(read_only=True, many=True)
+   user_register = UserProfileSerializer(read_only=True)
 
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register',
                 'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active',
-                'type_publication_detail', 'activity', 'user_update', 'medios', 'user_name', 'user_lastname',
-                'user_email', 'media_profile', 'medios_data', 'actionPublication')
+                'type_publication_detail', 'activity', 'user_update', 'medios', 'medios_data', 'actionPublication', 'user_register')
       read_only_fields  = ('active', )
 
    def create(self, validated_data):
