@@ -8,8 +8,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
-
-
+import json
 from . import permissions
 from . import serializers
 from . import models
@@ -53,9 +52,19 @@ class LoginViewSet(viewsets.ViewSet):
         """
         USE THE ObtainedAuthToken APIView TO VALIDATE AND CREATE A TOKEN.
         """
+        _response = ObtainAuthToken().post(request)
+        #_user = models.UserProfile.objects.get()
+        #user  = serializers.UserProfileSerializer()
+        _useremail = request.POST.get('username')
+        _user  = models.UserProfile.objects.filter(email = _useremail)
+        if _user is not None:
+            serializer = serializers.UserProfileSerializer(_user, many=True)
+            _response.data['userprofile'] = serializer.data
+        return _response
 
-        return ObtainAuthToken().post(request)
 
+    def get_authenticate_header(self, request):
+        pass
 
 
 class TypeActionViewSet(viewsets.ModelViewSet):
