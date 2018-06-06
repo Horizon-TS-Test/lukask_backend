@@ -8,6 +8,7 @@ from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
+from django_filters.rest_framework import DjangoFilterBackend
 
 from . import permissions
 from . import serializers
@@ -90,7 +91,9 @@ class ActionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ActionSerializer
     queryset = models.ActionPublication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
     filter_backends = (filters.SearchFilter,)
-    search_fields = ('description_action')
+    search_fields = ('description','publication__id_publication')
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('type_action__id_type_action', 'publication__id_publication')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 
