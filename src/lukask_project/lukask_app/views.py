@@ -53,8 +53,11 @@ class LoginViewSet(viewsets.ViewSet):
         USE THE ObtainedAuthToken APIView TO VALIDATE AND CREATE A TOKEN.
         """
         _response = ObtainAuthToken().post(request)
-        _useremail = request.POST.get('username')
-        _user  = models.UserProfile.objects.filter(email = _useremail)
+        _useremail = request.data.get('username')
+
+        if _useremail is not None:
+            _user  = models.UserProfile.objects.filter(email = _useremail)
+
         if _user is not None:
             serializer = serializers.UserProfileSerializer(_user, many=True)
             _response.data['userprofile'] = serializer.data[0]
