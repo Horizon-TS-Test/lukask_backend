@@ -352,7 +352,10 @@ class ActionPublication(models.Model):
 
 
     def __str__(self):
-        return self.description
+        _data = self.description
+        if _data is None:
+            _data = "default"
+        return _data
 
 
 class Multimedia(models.Model):

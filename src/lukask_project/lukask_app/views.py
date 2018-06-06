@@ -90,7 +90,6 @@ class ActionViewSet(viewsets.ModelViewSet):
     """
     serializer_class = serializers.ActionSerializer
     queryset = models.ActionPublication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_register')
-    filter_backends = (filters.SearchFilter,)
     search_fields = ('description','publication__id_publication')
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('type_action__id_type_action', 'publication__id_publication')
