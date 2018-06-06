@@ -260,6 +260,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
 
+
 class PublicationSerializer(serializers.ModelSerializer):
    """
    CLASE SERIALIZADORA PARA EL OBJECTO PUBLICATION CRUD
@@ -270,7 +271,6 @@ class PublicationSerializer(serializers.ModelSerializer):
    priority_publication_detail = serializers.CharField(read_only=True, source="priority_publication.description")
    type_publication_detail = serializers.CharField(read_only=True, source="type_publication.description")
    user_update = UserProfileSerializer(read_only=True)
-   #actionPublication = ActionSerializer(read_only=True, many=True)
    user_register = UserProfileSerializer(read_only=True)
    count_relevance = serializers.SerializerMethodField()
 

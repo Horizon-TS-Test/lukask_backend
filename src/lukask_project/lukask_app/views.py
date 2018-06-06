@@ -9,6 +9,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
 from . import permissions
 from . import serializers
@@ -108,6 +109,17 @@ class ActionViewSet(viewsets.ModelViewSet):
         except UnreadablePostError:
             print (Http404.message)
             raise Http404
+
+    def get_queryset(self):
+        req = self.request
+        qrOp = req.query_params.get('qrOp')
+        if qrOp is not None:
+            if qrOp ==  LukaskConstants.FILTERS_ACTION_CHILDREN:
+                return models.ActionPublication.objects.filter(active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(action_parent = None).order_by('-date_register')
+            elif qrOp == LukaskConstants.FILTERS_ACTION_CHILDLESS:
+                return models.ActionPublication.objects.filter(active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(~Q(action_parent = None)).order_by('-date_register')
+
+        return models.ActionPublication.objects.filter(active = LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('-date_register')
 
 class PriorityPublicationViewSet(viewsets.ModelViewSet):
     """"
