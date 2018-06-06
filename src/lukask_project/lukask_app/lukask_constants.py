@@ -8,3 +8,9 @@ class LukaskConstants:
     #-----------------------------------------#
     LOGICAL_STATE_ACTIVE                = True
     LOGICAL_STATE_INACTIVE              = False
+
+
+    # -----------------------------------------#
+    #   constantes para busqueda en DB         #
+    # -----------------------------------------#
+    TYPE_ACTION_RELEVANCIA              = 'Relevancia'

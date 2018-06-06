@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .lukask_constants import LukaskConstants
-import datetime
 
 from . import models
 
@@ -271,14 +270,15 @@ class PublicationSerializer(serializers.ModelSerializer):
    priority_publication_detail = serializers.CharField(read_only=True, source="priority_publication.description")
    type_publication_detail = serializers.CharField(read_only=True, source="type_publication.description")
    user_update = UserProfileSerializer(read_only=True)
-   actionPublication = ActionSerializer(read_only=True, many=True)
+   #actionPublication = ActionSerializer(read_only=True, many=True)
    user_register = UserProfileSerializer(read_only=True)
+   count_relevance = serializers.SerializerMethodField()
 
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register',
                 'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active',
-                'type_publication_detail', 'activity', 'user_update', 'medios', 'medios_data', 'actionPublication', 'user_register')
+                'type_publication_detail', 'activity', 'user_update', 'medios', 'medios_data', 'user_register', 'count_relevance')
       read_only_fields  = ('active', )
 
    def create(self, validated_data):
@@ -291,6 +291,8 @@ class PublicationSerializer(serializers.ModelSerializer):
                 models.Multimedia.objects.create(publication = publication_info, user_register = user_reg,  **medio)
         return publication_info
 
+   def get_relevance_publication(self):
+        pass
 
    def update(self, instance, validated_data):
         instance.user_update    = validated_data.get("user_update", instance.user_update)
@@ -307,6 +309,8 @@ class PublicationSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+   def get_count_relevance(self, obj):
+       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCIA).count()
 
 
 

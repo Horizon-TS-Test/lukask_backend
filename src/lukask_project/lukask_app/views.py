@@ -89,7 +89,7 @@ class ActionViewSet(viewsets.ModelViewSet):
     HANDLES CREATING, READING AND UPDATING TODOS.
     """
     serializer_class = serializers.ActionSerializer
-    queryset = models.ActionPublication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    queryset = models.ActionPublication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_register')
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description','publication__id_publication')
     filter_backends = (DjangoFilterBackend,)
@@ -193,6 +193,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
             serializer.save(user_update = self.request.user)
         except UnreadablePostError:
             raise Http404
+
 
 class MultimediaViewSet(viewsets.ModelViewSet):
     """"
