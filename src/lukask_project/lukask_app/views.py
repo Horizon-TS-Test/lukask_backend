@@ -93,7 +93,7 @@ class ActionViewSet(viewsets.ModelViewSet):
     queryset = models.ActionPublication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_register')
     search_fields = ('description','publication__id_publication')
     filter_backends = (DjangoFilterBackend,)
-    filter_fields = ('type_action__id_type_action', 'publication__id_publication')
+    filter_fields = ('type_action__id_type_action', 'publication__id_publication', 'action_parent__id_action')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 
