@@ -15,5 +15,5 @@ class LukaskConstants:
     # -----------------------------------------#
     TYPE_ACTION_RELEVANCIA              = 'Relevancia'
     FILTERS_ACTION_CHILDREN             = 'children'
-    FILTERS_ACTION_PARENTS              = 'parents'
-    FILTERS_ACTION_CHILDLESS            = 'childless'
+    FILTERS_ACTION_COMMENTS             = 'comments'
+    FILTERS_ACTION_REPLIES              = 'replies'

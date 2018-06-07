@@ -120,9 +120,9 @@ class ActionViewSet(viewsets.ModelViewSet):
         print ("qrOP", qrOp)
         if qrOp is None:
             return models.ActionPublication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('-date_register')
-        if qrOp == LukaskConstants.FILTERS_ACTION_CHILDREN:
+        if qrOp == LukaskConstants.FILTERS_ACTION_REPLIES:
             return models.ActionPublication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(action_parent=None).order_by('-date_register')
-        elif qrOp == LukaskConstants.FILTERS_ACTION_CHILDLESS:
+        elif qrOp == LukaskConstants.FILTERS_ACTION_COMMENTS:
             return models.ActionPublication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(~Q(action_parent=None)).order_by('-date_register')
 
 class PriorityPublicationViewSet(viewsets.ModelViewSet):
