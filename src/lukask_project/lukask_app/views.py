@@ -209,6 +209,8 @@ class PublicationViewSet(viewsets.ModelViewSet):
         except UnreadablePostError:
             raise Http404
 
+    def get_serializer_context(self):
+        return {'user': self.request.user.email}
 
 class MultimediaViewSet(viewsets.ModelViewSet):
     """"

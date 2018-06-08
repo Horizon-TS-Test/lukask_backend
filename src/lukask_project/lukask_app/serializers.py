@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from django.db.models import Q
 from .lukask_constants import LukaskConstants
+
 
 from . import models
 
@@ -273,12 +275,14 @@ class PublicationSerializer(serializers.ModelSerializer):
    user_update = UserProfileSerializer(read_only=True)
    user_register = UserProfileSerializer(read_only=True)
    count_relevance = serializers.SerializerMethodField()
+   user_relevance = serializers.SerializerMethodField()
 
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register',
                 'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active',
-                'type_publication_detail', 'activity', 'user_update', 'medios', 'medios_data', 'user_register', 'count_relevance')
+                'type_publication_detail', 'activity', 'user_update', 'medios', 'medios_data', 'user_register', 'count_relevance',
+                'user_relevance')
       read_only_fields  = ('active', )
 
    def create(self, validated_data):
@@ -290,9 +294,6 @@ class PublicationSerializer(serializers.ModelSerializer):
                 print("medio .....after insert", medio)
                 models.Multimedia.objects.create(publication = publication_info, user_register = user_reg,  **medio)
         return publication_info
-
-   def get_relevance_publication(self):
-        pass
 
    def update(self, instance, validated_data):
         instance.user_update    = validated_data.get("user_update", instance.user_update)
@@ -310,11 +311,25 @@ class PublicationSerializer(serializers.ModelSerializer):
         return instance
 
    def get_count_relevance(self, obj):
-       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCIA).count()
+       """
+       Obtiene la cantidad de relevancia q se han dado sobre una publicacion
+       :param obj:
+       :return: interger
+       """
+       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCIA).exclude(publication = None).count()
 
-
-
-
+   def get_user_relevance(self, obj):
+       """
+       Verifica que el usuario en sesion, dio relevancia a una publicacion, este proceso lo hace registro por registro.
+       :param obj:
+       :return: boolean
+       """
+       user = self.context.get("user")
+       publication = obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCIA, user_register__email = user,
+                                                  action_parent = None).exclude(publication = None)
+       if not publication:
+           return False
+       return True
 
 
 
