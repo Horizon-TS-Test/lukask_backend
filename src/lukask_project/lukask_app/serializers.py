@@ -360,7 +360,7 @@ class PublicationSerializer(serializers.ModelSerializer):
        """
        user = self.context.get("user")
        publication = obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, user_register__email = user,
-                                                  action_parent = None).exclude(publication = None)
+                                                  action_parent = None, active = True).exclude(publication = None)
        if not publication:
            return False
        return True
