@@ -1,3 +1,5 @@
+import datetime
+
 from rest_framework import serializers
 from django.db.models import Q
 from .lukask_constants import LukaskConstants
@@ -244,21 +246,53 @@ class ActionSerializer(serializers.ModelSerializer):
         fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'type_action',
                   'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
                   'user_register')
-        read_only_fields = ('date_register', 'user_register', 'active')
+        read_only_fields = ('date_register', 'user_register')
 
 
     def create(self, validated_data):
         """
-
+        Permite la creacion de acciones sobre la publicacion, actualiza o crea una accion,
+        simpre y cuando sea de tipo relevancia.
         :param validated_data:
         :return:
         """
         _user_register = validated_data.get('user_register')
-        _multimedia_publication = validated_data.pop('multimedia', None)
-        _action_publication = models.ActionPublication.objects.create(**validated_data)
-        if _multimedia_publication is not None:
-            models.Multimedia.objects.create(actionPublication = _action_publication, user_register = _user_register, **_multimedia_publication)
-        return _action_publication
+        _publication = validated_data.get('publication')
+        _type_action = validated_data.get('type_action')
+        _action_publication_update_or_create = None
+
+        if _type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE:
+
+            #Valia si existe ya alguna accion de tipo relevancia
+            try:
+                _action_publication_update_or_create = models.ActionPublication.objects.get(user_register = _user_register, publication = _publication,
+                                                                                        type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE)
+
+                #Actualiza
+                _action_publication_update_or_create.date_update = datetime.datetime.now()
+                _action_publication_update_or_create.user_update = _user_register
+                _action_publication_update_or_create.active = validated_data.get('active', False)
+                _action_publication_update_or_create.save()
+                return  _action_publication_update_or_create
+
+            except models.ActionPublication.DoesNotExist:
+
+                #Crea
+                _action_publication_update_or_create = models.ActionPublication()
+                for key, value in validated_data.items():
+                    setattr(_action_publication_update_or_create, key, value)
+                _action_publication_update_or_create.save()
+                return  _action_publication_update_or_create
+
+        else:
+
+            #Crea una accion que no sea de tipo relevancia.
+            _multimedia_publication = validated_data.pop('multimedia', None)
+            _action_publication_update_or_create = models.ActionPublication.objects.create(**validated_data)
+            if _multimedia_publication is not None:
+                models.Multimedia.objects.create(actionPublication = _action_publication_update_or_create, user_register = _user_register, **_multimedia_publication)
+
+        return _action_publication_update_or_create
 
 
 
@@ -316,7 +350,7 @@ class PublicationSerializer(serializers.ModelSerializer):
        :param obj:
        :return: interger
        """
-       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCIA).exclude(publication = None).count()
+       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE).exclude(publication = None).count()
 
    def get_user_relevance(self, obj):
        """
@@ -325,7 +359,7 @@ class PublicationSerializer(serializers.ModelSerializer):
        :return: boolean
        """
        user = self.context.get("user")
-       publication = obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCIA, user_register__email = user,
+       publication = obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, user_register__email = user,
                                                   action_parent = None).exclude(publication = None)
        if not publication:
            return False

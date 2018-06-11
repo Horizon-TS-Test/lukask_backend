@@ -105,7 +105,7 @@ class ActionViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         try:
-            serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+            serializer.save(user_register = self.request.user)
         except UnreadablePostError:
             print (Http404.message)
             raise Http404
