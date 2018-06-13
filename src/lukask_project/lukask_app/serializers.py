@@ -330,18 +330,26 @@ class PublicationSerializer(serializers.ModelSerializer):
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register',
                 'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active',
-                'type_publication_detail', 'activity', 'user_update', 'medios', 'medios_data', 'user_register', 'count_relevance',
+                'type_publication_detail', 'activity', 'user_update', 'address', 'medios', 'medios_data', 'user_register', 'count_relevance',
                 'user_relevance')
       read_only_fields  = ('active', )
 
    def create(self, validated_data):
+        print("validated_data...........", validated_data)
         medios = validated_data.pop('medios_data')
         user_reg = validated_data.get('user_register')
         publication_info = models.Publication.objects.create(**validated_data)
         if medios is not None:
-            for medio in medios:
-                print("medio .....after insert", medio)
-                models.Multimedia.objects.create(publication = publication_info, user_register = user_reg,  **medio)
+            if len(medios) > 0:
+                print ("con datos para multimedia")
+                for medio in medios:
+                    print("medio .....after insert", medio)
+                    models.Multimedia.objects.create(publication = publication_info, user_register = user_reg,  **medio)
+            else:
+                print ("sin datos para multimedia")
+                descripcion = validated_data.get('detail')
+                models.Multimedia.objects.create(format_multimedia  = 'IG', name_file = 'Default', description_file = descripcion[0:48], publication = publication_info )
+
         return publication_info
 
    def update(self, instance, validated_data):
@@ -354,6 +362,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         instance.active         = validated_data.get("active", instance.active)
         instance.priority_publication = validated_data.get("priority_publication", instance.priority_publication)
         instance.type_publication = validated_data.get("type_publication", instance.type_publication)
+        instance.address        = validated_data.get("address", instance.address)
         instance.activity = validated_data.get("activity", instance.activity)
         instance.location  = validated_data.get("location", instance.location)
         instance.save()

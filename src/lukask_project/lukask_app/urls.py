@@ -5,7 +5,7 @@ from . import views
 router = DefaultRouter()
 router.register("login", views.LoginViewSet, base_name= "login")
 router.register("userProfile", views.UserProfileViewSet)
-router.register("Person", views.PersonViewSet)
+router.register("person", views.PersonViewSet)
 router.register("TypeAction", views.TypeActionViewSet)
 router.register("actionPub", views.ActionViewSet)
 router.register("prioPub", views.PriorityPublicationViewSet)
