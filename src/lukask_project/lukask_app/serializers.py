@@ -60,7 +60,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.media_profile                  = validated_data.get('media_profile', instance.media_profile)
         instance.is_active                      = validated_data.get('is_active', instance.is_active)
         instance.date_update                    = datetime.datetime.now()
-        instance.set_password(validated_data.get('password', instance.password))
+        if validated_data.get('password') is not None:
+            instance.set_password(validated_data.get('password', instance.password))
         instance.person.age                     = person.get("age", instance.person.age)
         instance.person.identification_card     = person.get("identification_card", instance.person.identification_card)
         instance.person.name                    = person.get("name", instance.person.name)
