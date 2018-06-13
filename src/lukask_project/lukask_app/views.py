@@ -26,8 +26,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = models.UserProfile.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('email',)
-
     authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializers.save(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -40,7 +42,10 @@ class PersonViewSet(viewsets.ModelViewSet):
     queryset = models.Person.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('identification_card', 'name', 'last_name',)
-    authentication_classes = (TokenAuthentication,)
+    #authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializer.save(active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
 
 class LoginViewSet(viewsets.ViewSet):

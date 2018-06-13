@@ -88,6 +88,8 @@ class Person(models.Model):
     telephone = models.CharField(max_length=10)
     address = models.CharField(max_length=75)
     active = models.BooleanField(default=True)
+    date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(null=True, blank=True)
     #user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     #user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pr")
 
@@ -124,6 +126,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
+    date_update = models.DateTimeField(null=True, blank=True)
     person = models.OneToOneField('person', related_name='userProfile', on_delete=models.CASCADE, null=True)
     media_profile =  models.ImageField(upload_to='medios_profile', default='default_profile.png')
     objects = UserProfileManager()

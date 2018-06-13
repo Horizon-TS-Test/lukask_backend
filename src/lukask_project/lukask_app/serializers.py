@@ -17,7 +17,8 @@ class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Person
         fields = ('id_person', 'age', 'identification_card', 'name',
-                  'last_name', 'telephone', 'address', 'active')
+                  'last_name', 'telephone', 'address', 'active', 'date_register', 'date_update')
+        read_only_fields = ('active', 'date_register', 'date_update')
 
 
 
@@ -25,20 +26,23 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     CALSE SERIALIZABLE PARA  OBJECTS USERPROFILE
     """
-    person = PersonSerializer(read_only=True)
-    personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
+    person = PersonSerializer()
+    #personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
     class Meta:
         model = models.UserProfile
-        fields = ('id','email', 'password', 'person', 'personSelect', 'media_profile')
+        fields = ('id','email', 'password','media_profile', 'date_update', 'is_active', 'person')
+        read_only_fields = ("date_uodate",)
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         """
         CREATE AND RETURN A NEW USER.
         """
+        _data_person = validated_data.pop('person')
+        person = models.Person.objects.create(**_data_person)
         user = models.UserProfile(
             email= validated_data['email'],
-            person= validated_data['person'],
+            person= person,
             media_profile = validated_data['media_profile']
         )
 
@@ -51,12 +55,22 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """
         UPDATE AND RETURN A USER.
         """
-        instance.email          = validated_data.get('email', instance.email)
-        instance.person         = validated_data.get('person', instance.person)
-        instance.media_profile  = validated_data.get('media_profile', instance.media_profile)
+        person = validated_data.get("person")
+        instance.email                          = validated_data.get('email', instance.email)
+        instance.media_profile                  = validated_data.get('media_profile', instance.media_profile)
+        instance.is_active                      = validated_data.get('is_active', instance.is_active)
+        instance.date_update                    = datetime.datetime.now()
         instance.set_password(validated_data.get('password', instance.password))
+        instance.person.age                     = person.get("age", instance.person.age)
+        instance.person.identification_card     = person.get("identification_card", instance.person.identification_card)
+        instance.person.name                    = person.get("name", instance.person.name)
+        instance.person.last_name               = person.get("last_name", instance.person.last_name)
+        instance.person.telephone               = person.get("telephone", instance.person.telephone)
+        instance.person.address                 = person.get("address", instance.person.address)
+        instance.person.active                  = validated_data.get('is_active', instance.is_active)
+        instance.person.date_update             = datetime.datetime.now()
+        instance.person.save()
         instance.save()
-
         return instance
 
 class ProfileSerializer(serializers.ModelSerializer):
