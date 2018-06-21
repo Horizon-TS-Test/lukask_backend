@@ -16,8 +16,8 @@ class PersonSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.Person
-        fields = ('id_person', 'age', 'identification_card', 'name',
-                  'last_name', 'telephone', 'address', 'active', 'date_register', 'date_update')
+        fields = ('id_person', 'age', 'identification_card', 'name', 'last_name', 'telephone', 'cell_phone', 'birthdate',
+                  'address', 'active', 'date_register', 'date_update')
         read_only_fields = ('active', 'date_register', 'date_update')
 
 
