@@ -67,7 +67,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         if _user is not None:
             serializer = serializers.UserProfileSerializer(_user, many=True)
-            _response.data['userprofile'] = serializer.data[0]
+            _response.data['user_id'] = serializer.data[0].get("id")
         return _response
 
 
