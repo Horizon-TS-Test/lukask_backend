@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'lukask_app',
     'rest_framework',
     'rest_framework.authtoken',
+	'sslserver',
     #'corsheaders',
     'channels',
     'channels_api',
