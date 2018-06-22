@@ -67,6 +67,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.person.name                    = person.get("name", instance.person.name)
         instance.person.last_name               = person.get("last_name", instance.person.last_name)
         instance.person.telephone               = person.get("telephone", instance.person.telephone)
+        instance.person.cell_phone              = person.get("cell_phone", instance.person.cell_phone)
+        instance.person.birthdate               = person.get("birthdate", instance.person.birthdate)
         instance.person.address                 = person.get("address", instance.person.address)
         instance.person.active                  = validated_data.get('is_active', instance.is_active)
         instance.person.date_update             = datetime.datetime.now()
