@@ -14,6 +14,7 @@ router.register("publication", views.PublicationViewSet)
 router.register("tracing", views.TracingViewSet)
 router.register("activity", views.ActivityViewSet)
 router.register("multimedia", views.MultimediaViewSet)
+router.register("notification", views.NotificationViewSet)
 #router.register("singleMultimedia", views.MultimediaSingleAPIView)
 #router.register(r'crearPublicacion', views.PublicationCreateAPIView, base_name='create')
 

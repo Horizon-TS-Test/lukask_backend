@@ -273,3 +273,24 @@ class MultimediaSingleAPIView(generics.ListCreateAPIView):
             return models.UserProfile.objects.get(pk=pk)
         except models.UserProfile.DoesNotExist:
             raise Http404
+
+class NotificationViewSet(viewsets.ModelViewSet):
+    """
+    View para gestionar Notificaciones
+    """
+    serializer_class =  serializers.NotificationSerializer
+    queryset = models.Notification.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('date_generated_notification')
+    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
+    authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+
+
+    def get_user_register(self, pk):
+        try:
+            return models.UserProfile.objects.get(pk=pk)
+        except models.UserProfile.DoesNotExist:
+            raise Http404

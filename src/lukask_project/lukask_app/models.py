@@ -393,3 +393,13 @@ class Multimedia(models.Model):
     actionPublication   =   models.ForeignKey('actionpublication', related_name='mediosactionPub', on_delete=models.CASCADE, null=True)
 
 
+class Notification(models.Model):
+    """
+    MODELO NOTIFICACION QUE REPRESENTA A LA TABLA lukask_app_notification DE LA DB LUKASK_DB
+    """
+    id_notification             = models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable=False)
+    description_notification    = models.CharField(max_length=100, null=True)
+    date_register               = models.DateTimeField(auto_now_add = True)
+    date_generated_notification = models.DateTimeField(null = True, blank = True)
+    user_register               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    active                      = models.BooleanField(default=True)

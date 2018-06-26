@@ -392,7 +392,13 @@ class PublicationSerializer(serializers.ModelSerializer):
        return True
 
 
-
-
-
+class NotificationSerializer(serializers.ModelSerializer):
+    """
+     CLASE SERIALIZADORA  PARA EL OBJETO NOTIFICATION CRUD
+    """
+    user_register = UserProfileSerializer(read_only=True)
+    class Meta:
+        model  = models.Notification
+        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated_notification', 'user_register','active')
+        read_only_fields = ('date_register', 'active')
 

@@ -15,6 +15,7 @@ admin.site.register(models.Publication)
 admin.site.register(models.TypeAction)
 admin.site.register(models.ActionPublication)
 admin.site.register(models.Multimedia)
+admin.site.register(models.Notification)
 
 
 
