@@ -21,6 +21,7 @@ from django.db import models
 # FOR AUTHENTICATION:
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager
+from django.contrib.postgres.fields import JSONField
 # PERMISSIONS FOR SPECIFIC USERS TO LET THEM TO DO SOMETHING:
 from django.contrib.auth.models import PermissionsMixin
 import uuid
@@ -403,3 +404,15 @@ class Notification(models.Model):
     date_generated_notification = models.DateTimeField(null = True, blank = True)
     user_register               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
     active                      = models.BooleanField(default=True)
+    users_notificated           = models.ManyToManyField(UserProfile, through='NotificationReceived', related_name="usernotificated")
+
+
+
+class NotificationReceived(models.Model):
+    """
+    MODELO NOTIFICAIONES RECIBIDAS QUE REPRESENTA A LA TABLA lukask_app_notificationreceived DE LA LUKASK_DB
+    """
+    user_received               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name='userreceived')
+    notification                = models.ForeignKey(Notification, on_delete=models.CASCADE, null=True, related_name='notification')
+    date_register               = models.DateTimeField(auto_now_add= True)
+

@@ -1,9 +1,7 @@
 import datetime
 
 from rest_framework import serializers
-from django.db.models import Q
 from .lukask_constants import LukaskConstants
-
 
 from . import models
 
@@ -257,12 +255,13 @@ class ActionSerializer(serializers.ModelSerializer):
     media_file = serializers.FileField(write_only=True, source="multimedia.media_file", required=False)
     mediosactionPub = MultimediaSerializer(read_only=True, many=True)
     user_register = UserProfileSerializer(read_only=True)
+    users_that_commnet = serializers.SerializerMethodField()
 
     class Meta:
         model = models.ActionPublication
         fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'type_action',
                   'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
-                  'user_register')
+                  'user_register', 'users_that_commnet')
         read_only_fields = ('date_register', 'user_register')
 
 
@@ -306,12 +305,38 @@ class ActionSerializer(serializers.ModelSerializer):
             #Crea una accion que no sea de tipo relevancia.
             _multimedia_publication = validated_data.pop('multimedia', None)
             _action_publication_update_or_create = models.ActionPublication.objects.create(**validated_data)
+
             if _multimedia_publication is not None:
                 models.Multimedia.objects.create(actionPublication = _action_publication_update_or_create, user_register = _user_register, **_multimedia_publication)
-
+            print ("_action_publication_update_or_create....", _action_publication_update_or_create)
         return _action_publication_update_or_create
 
 
+    def get_users_that_commnet(self, obj):
+
+        from django.core import serializers
+        users_register = None
+
+        #Si es una comentario a la Publicacio
+        if obj.publication is not None and obj.action_parent is None:
+            users_register =  models.ActionPublication.objects.filter(
+                type_action__description_action =  LukaskConstants.TYPE_ACTION_COMMENTS,
+                publication = obj.publication, action_parent = None).exclude(user_register__id = obj.user_register.id).order_by(
+                'user_register').distinct('user_register')
+
+        #Si es una respuesta de un comentario
+        elif obj.publication is not None and obj.action_parent is not None:
+            users_register = models.ActionPublication.objects.filter(
+                type_action__description_action=LukaskConstants.TYPE_ACTION_COMMENTS,
+                publication=obj.publication, action_parent = obj.action_parent).exclude(user_register__id=obj.user_register.id).order_by(
+                'user_register').distinct('user_register')
+
+        #Todos los acciones que interactuan con la publicacion
+        else:
+            users_register = models.ActionPublication.objects.filter(publication = obj.publication).exclude(
+                user_register__id=obj.user_register.id).order_by('user_register').distinct('user_register')
+        print ("users_register......", users_register)
+        return  serializers.serialize('json', users_register, fields=('user_register',))
 
 
 class PublicationSerializer(serializers.ModelSerializer):

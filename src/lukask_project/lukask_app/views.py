@@ -29,7 +29,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
-        serializers.save(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+        serializer.save(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
 
 class PersonViewSet(viewsets.ModelViewSet):
