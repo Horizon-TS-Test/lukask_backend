@@ -14,10 +14,10 @@ Vagrant.configure("2") do |config|
   # boxes at https://atlas.hashicorp.com/search.
   config.vm.box = "ubuntu/xenial64"
 
-  config.vm.network "forwarded_port", host_ip: "127.0.0.1", guest: 8080, host: 8080
+  config.vm.network "forwarded_port", host_ip: "127.0.0.1", guest: 8080, host: 8081
   config.vm.network "forwarded_port", host_ip: "127.0.0.1", guest: 9432, host: 9432
   # REF: https://www.vagrantup.com/docs/networking/public_network.html
-  #config.vm.network "public_network", :bridge=> "Intel(R) Centrino(R) Wireless-N 2200", ip: "192.168.1.50"
+  config.vm.network "public_network", :bridge=> "Qualcomm Atheros AR956x Wireless Network Adapter", ip: "192.168.1.56"
 
   config.vm.provision "shell", inline: <<-SHELL
     # Update and upgrade the server packages.

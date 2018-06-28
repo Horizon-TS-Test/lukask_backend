@@ -25,7 +25,7 @@ SECRET_KEY = '8$y=e+2*@5!zz3*67u(t9iub+1ug&&3t!7o12#0=j!1r-^akq)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.1.56']
 
 
 # Application definition
@@ -40,10 +40,12 @@ INSTALLED_APPS = [
     'lukask_app',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders',
+	'sslserver',
+    #'corsheaders',
     'channels',
     'channels_api',
-    'tornado_websockets',
+    'django_filters'
+    #'tornado_websockets',
 ]
 
 MIDDLEWARE = [
@@ -85,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'lukask_db',
         'USER': 'lukask_back_user',
-        'PASSWORD': 'lukask7!',
+        'PASSWORD': 'lukask',
         'HOST': '127.0.0.1',
         'PORT': '5432',
         'ATOMIC_REQUESTS': False,
@@ -131,6 +133,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/repositorio_lukask/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'repositorio_lukask')
 
 AUTH_USER_MODEL = 'lukask_app.UserProfile'
 
@@ -163,7 +167,7 @@ CHANNEL_LAYERS = {
     "default": {
         # "BACKEND": "asgiref.inmemory.ChannelLayer", # USING DAPHNE CHANNEL LAYER FOR DEVELOPMENT
         "BACKEND": "asgi_redis.RedisChannelLayer",  # USING REDIS CHANNEL LAYER FOR PRODUCTION
-        "ROUTING": "channels_api_proj.routing.channel_routing",
+        "ROUTING": "lukask_project.routing.channel_routing",
         "CONFIG": {
             # USING DOMAIN NAME IN PRODUCTION:
             # "hosts": [("redis-channel-1", 6379), ("redis-channel-2", 6379)]
@@ -186,4 +190,15 @@ TORNADO = {
     'settings': {
         'debug': True,
     },
+}
+
+
+#--------------------------------------------------------------------------------
+#                   PAGINATION
+#--------------------------------------------------------------------------------
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 5,
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
