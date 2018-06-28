@@ -294,3 +294,19 @@ class NotificationViewSet(viewsets.ModelViewSet):
             return models.UserProfile.objects.get(pk=pk)
         except models.UserProfile.DoesNotExist:
             raise Http404
+
+
+class NotificationReceivedViewSet(viewsets.ModelViewSet):
+    """
+    View para gestionar Notificaciones
+    """
+    serializer_class =  serializers.NotificationReceivedSerializer
+    queryset = models.NotificationReceived.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('notification')
+
+    def get_user_register(self, pk):
+        try:
+            return models.UserProfile.objects.get(pk=pk)
+        except models.UserProfile.DoesNotExist:
+            raise Http404
