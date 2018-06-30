@@ -4,7 +4,7 @@ from channels.generic.websockets import WebsocketDemultiplexer
 from lukask_app.bindings import PublicationBinding
 from lukask_app.bindings import MultimediaBinding
 from lukask_app.bindings import ActionPublicationBinding
-from lukask_app.bindings import NotificationBinding
+from lukask_app.bindings import NotificationReceivedBinding
 
 
 class ChannelApiAppDemultiplexer(WebsocketDemultiplexer):
@@ -12,7 +12,7 @@ class ChannelApiAppDemultiplexer(WebsocketDemultiplexer):
         'publication': PublicationBinding.consumer,
         'multimedia' : MultimediaBinding.consumer,
         'comments'   : ActionPublicationBinding.consumer,
-        'notification' : NotificationBinding.consumer
+        'notification_received' : NotificationReceivedBinding
     }
 
 channel_routing = [

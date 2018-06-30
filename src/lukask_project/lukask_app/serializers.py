@@ -416,14 +416,36 @@ class PublicationSerializer(serializers.ModelSerializer):
            return False
        return True
 
+class NotificationReceivedSerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZADORA PARA EL OBJETO NOTIFICATIONRECEIVED CRUD
+    """
+    class Meta:
+        model = models.NotificationReceived
+        fields  = ('description_notif_rec', 'user_received', 'notification', 'date_register')
+        read_only_fields = ('date_register',)
+
 
 class NotificationSerializer(serializers.ModelSerializer):
     """
      CLASE SERIALIZADORA  PARA EL OBJETO NOTIFICATION CRUD
     """
     user_register = UserProfileSerializer(read_only=True)
+    users_notificated = NotificationReceivedSerializer(many=True, write_only=True)
+
     class Meta:
         model  = models.Notification
-        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated_notification', 'user_register','active')
+        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated_notification', 'user_register','active', 'users_notificated')
         read_only_fields = ('date_register', 'active')
+
+    def create(self, validated_data):
+        print("validated_data", validated_data)
+        notifs_received = validated_data.pop("users_notificated", None)
+        notification =  models.Notification.objects.create(**validated_data)
+        if notifs_received is not None:
+            for notif_received in notifs_received:
+                models.NotificationReceived.objects.create(date_register = datetime.datetime.now(), notification = notification, **notif_received)
+        return notification
+
+
 

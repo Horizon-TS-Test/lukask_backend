@@ -406,13 +406,17 @@ class Notification(models.Model):
     active                      = models.BooleanField(default=True)
     users_notificated           = models.ManyToManyField(UserProfile, through='NotificationReceived', related_name="usernotificated")
 
+    def __str__(self):
+        return self.description_notification
 
 
 class NotificationReceived(models.Model):
     """
     MODELO NOTIFICAIONES RECIBIDAS QUE REPRESENTA A LA TABLA lukask_app_notificationreceived DE LA LUKASK_DB
     """
+    description_notif_rec       = models.CharField(max_length=100, null = True)
     user_received               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name='userreceived')
     notification                = models.ForeignKey(Notification, on_delete=models.CASCADE, null=True, related_name='notification')
     date_register               = models.DateTimeField(auto_now_add= True)
+    active                      = models.BooleanField(default=True)
 
