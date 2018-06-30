@@ -12,7 +12,7 @@ class ChannelApiAppDemultiplexer(WebsocketDemultiplexer):
         'publication': PublicationBinding.consumer,
         'multimedia' : MultimediaBinding.consumer,
         'comments'   : ActionPublicationBinding.consumer,
-        'notification_received' : NotificationReceivedBinding
+        'notification_received' : NotificationReceivedBinding.consumer
     }
 
 channel_routing = [
