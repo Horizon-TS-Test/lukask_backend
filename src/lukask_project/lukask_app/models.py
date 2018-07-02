@@ -417,6 +417,6 @@ class NotificationReceived(models.Model):
     description_notif_rec       = models.CharField(max_length=100, null = True)
     user_received               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name='userreceived')
     notification                = models.ForeignKey(Notification, on_delete=models.CASCADE, null=True, related_name='notification')
-    date_register               = models.DateTimeField(auto_now_add= True)
+    date_register               = models.DateTimeField(null = True)
     active                      = models.BooleanField(default=True)
 
