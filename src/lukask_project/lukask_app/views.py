@@ -301,8 +301,9 @@ class NotificationReceivedViewSet(viewsets.ModelViewSet):
     View para gestionar Notificaciones
     """
     serializer_class =  serializers.NotificationReceivedSerializer
-    queryset = models.NotificationReceived.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
-    filter_backends = (filters.SearchFilter,)
+    queryset = models.NotificationReceived.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_register')
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('user_received',)
     search_fields = ('notification')
 
     def get_user_register(self, pk):
