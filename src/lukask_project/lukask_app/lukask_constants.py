@@ -14,7 +14,7 @@ class LukaskConstants:
     #   constantes para busqueda en DB         #
     # -----------------------------------------#
     TYPE_ACTION_RELEVANCE               = 'Relevancia'
-    TYPE_ACTION_COMMENTS                = 'comentario'
+    TYPE_ACTION_COMMENTS                = 'Comentario'
     FILTERS_ACTION_CHILDREN             = 'children'
     FILTERS_ACTION_COMMENTS             = 'comments'
     FILTERS_ACTION_REPLIES              = 'replies'

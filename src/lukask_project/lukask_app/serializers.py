@@ -255,13 +255,13 @@ class ActionSerializer(serializers.ModelSerializer):
     media_file = serializers.FileField(write_only=True, source="multimedia.media_file", required=False)
     mediosactionPub = MultimediaSerializer(read_only=True, many=True)
     user_register = UserProfileSerializer(read_only=True)
-    users_that_commnet = serializers.SerializerMethodField()
+    received = serializers.SerializerMethodField()
 
     class Meta:
         model = models.ActionPublication
         fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'type_action',
                   'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
-                  'user_register', 'users_that_commnet')
+                  'user_register', 'received')
         read_only_fields = ('date_register', 'user_register')
 
 
@@ -312,7 +312,7 @@ class ActionSerializer(serializers.ModelSerializer):
         return _action_publication_update_or_create
 
 
-    def get_users_that_commnet(self, obj):
+    def get_received(self, obj):
 
         from django.core import serializers
         users_register = None
@@ -420,9 +420,10 @@ class NotificationReceivedSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZADORA PARA EL OBJETO NOTIFICATIONRECEIVED CRUD
     """
+    user_emit = UserProfileSerializer(read_only = True, source = "notification.user_register")
     class Meta:
         model = models.NotificationReceived
-        fields  = ('description_notif_rec', 'user_received', 'notification', 'date_register')
+        fields  = ('description_notif_rec', 'user_received', 'notification', 'date_register', 'user_emit')
         read_only_fields = ('date_register',)
 
 
@@ -435,16 +436,17 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = models.Notification
-        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated_notification', 'user_register','active', 'users_notificated')
+        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated', 'user_register','active', 'users_notificated')
         read_only_fields = ('date_register', 'active')
 
     def create(self, validated_data):
         print("validated_data", validated_data)
+        date_generated  = validated_data.get('date_generated', None)
         notifs_received = validated_data.pop("users_notificated", None)
         notification =  models.Notification.objects.create(**validated_data)
         if notifs_received is not None:
             for notif_received in notifs_received:
-                models.NotificationReceived.objects.create(date_register = datetime.datetime.now(), notification = notification, **notif_received)
+                models.NotificationReceived.objects.create(date_register = date_generated, notification = notification, **notif_received)
         return notification
 
 
