@@ -316,7 +316,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
         from django.core import serializers
         users_register = None
-
+        print ("obj....", obj.user_register)
         #Si es una comentario a la Publicacio
         if obj.publication is not None and obj.action_parent is None:
             users_register =  models.ActionPublication.objects.filter(
@@ -421,9 +421,10 @@ class NotificationReceivedSerializer(serializers.ModelSerializer):
     CLASE SERIALIZADORA PARA EL OBJETO NOTIFICATIONRECEIVED CRUD
     """
     user_emit = UserProfileSerializer(read_only = True, source = "notification.user_register")
+    url       = serializers.CharField(read_only = True, source = "notification.url")
     class Meta:
         model = models.NotificationReceived
-        fields  = ('description_notif_rec', 'user_received', 'notification', 'date_register', 'user_emit')
+        fields  = ('description_notif_rec', 'user_received', 'notification', 'date_register', 'url', 'user_emit')
         read_only_fields = ('date_register',)
 
 
@@ -436,7 +437,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = models.Notification
-        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated', 'user_register','active', 'users_notificated')
+        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated', 'url', 'user_register','active', 'users_notificated')
         read_only_fields = ('date_register', 'active')
 
     def create(self, validated_data):

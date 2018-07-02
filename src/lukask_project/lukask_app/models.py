@@ -403,6 +403,7 @@ class Notification(models.Model):
     date_register               = models.DateTimeField(auto_now_add = True)
     date_generated              = models.DateTimeField(null = True, blank = True)
     user_register               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    url                         = models.TextField(max_length = 255, null = True)
     active                      = models.BooleanField(default=True)
     users_notificated           = models.ManyToManyField(UserProfile, through='NotificationReceived', related_name="usernotificated")
 

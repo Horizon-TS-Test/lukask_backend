@@ -279,7 +279,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     View para gestionar Notificaciones
     """
     serializer_class =  serializers.NotificationSerializer
-    queryset = models.Notification.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    queryset = models.Notification.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_register')
     filter_backends = (filters.SearchFilter,)
     search_fields = ('date_generated_notification')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
