@@ -315,8 +315,9 @@ class ActionSerializer(serializers.ModelSerializer):
     def get_receivers(self, obj):
 
         from django.core import serializers
+        import json
         users_register = None
-        print ("obj....", obj.user_register)
+
         #Si es una comentario a la Publicacio
         if obj.publication is not None and obj.action_parent is None:
             users_register =  models.ActionPublication.objects.filter(
@@ -335,8 +336,26 @@ class ActionSerializer(serializers.ModelSerializer):
         else:
             users_register = models.ActionPublication.objects.filter(publication = obj.publication).exclude(
                 user_register__id=obj.user_register.id).order_by('user_register').distinct('user_register')
-        print ("users_register......", users_register)
-        return  serializers.serialize('json', users_register, fields=('user_register',))
+
+        #Validamos si existen  usuarios que han comentado
+        data_json = None
+        if not users_register :
+            list_pub = []
+            list_pub.append(obj.publication)
+            data_json = serializers.serialize('json', list_pub, fields=('user_register', 'owner',))
+        else :
+            data_json = serializers.serialize('json', users_register, fields=('user_register', 'owner',))
+
+        #Convetimos a formato Json
+        users_received = json.loads(data_json)
+        
+        #Validamos propietario del la publicación
+        for item_user in users_received:
+            item_user["fields"]["owner"] = False
+            if(item_user["fields"]["user_register"] == obj.publication.user_register.id):
+                item_user["fields"]["owner"] = True
+
+        return  users_received
 
 
 class PublicationSerializer(serializers.ModelSerializer):
