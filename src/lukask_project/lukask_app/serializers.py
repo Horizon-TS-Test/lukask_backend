@@ -318,6 +318,10 @@ class ActionSerializer(serializers.ModelSerializer):
         import json
         users_register = None
 
+        #Owners de la publicacion y comentario
+        owner_publication = obj.publication
+        owner_commet = None
+
         #Si es una comentario a la Publicacio
         if obj.publication is not None and obj.action_parent is None:
             users_register =  models.ActionPublication.objects.filter(
@@ -327,33 +331,72 @@ class ActionSerializer(serializers.ModelSerializer):
 
         #Si es una respuesta de un comentario
         elif obj.publication is not None and obj.action_parent is not None:
+
+            owner_commet = obj.action_parent
             users_register = models.ActionPublication.objects.filter(
                 type_action__description_action=LukaskConstants.TYPE_ACTION_COMMENTS,
                 publication=obj.publication, action_parent = obj.action_parent).exclude(user_register__id=obj.user_register.id).order_by(
                 'user_register').distinct('user_register')
+
+            #usuarios a notificar
+            users_register = list(users_register)
+            if not users_register and obj.user_register != owner_commet.user_register:
+                users_register.append(owner_commet)
+            elif users_register:
+
+                #Validamos que el usuario creador dela notificcion este en la lista
+                user_owner_in_notif = next((item for item in users_register if  item.user_register == owner_commet.user_register), None)
+                users_register.append(owner_commet)
+                print ("user_owner_in_notif....", user_owner_in_notif)
 
         #Todos los acciones que interactuan con la publicacion
         else:
             users_register = models.ActionPublication.objects.filter(publication = obj.publication).exclude(
                 user_register__id=obj.user_register.id).order_by('user_register').distinct('user_register')
 
+
         #Validamos si existen  usuarios que han comentado
         data_json = None
-        if not users_register :
+        if not users_register and obj.user_register != owner_publication.user_register:
             list_pub = []
             list_pub.append(obj.publication)
-            data_json = serializers.serialize('json', list_pub, fields=('user_register', 'owner',))
+            data_json = serializers.serialize('json', list_pub, fields =('user_register',))
         else :
-            data_json = serializers.serialize('json', users_register, fields=('user_register', 'owner',))
+            data_json = serializers.serialize('json', users_register, fields=('user_register',))
+
 
         #Convetimos a formato Json
         users_received = json.loads(data_json)
         
-        #Validamos propietario del la publicación
+        #Validamos propietario del la publicacion
+        in_list_owner = False
         for item_user in users_received:
-            item_user["fields"]["owner"] = False
-            if(item_user["fields"]["user_register"] == obj.publication.user_register.id):
-                item_user["fields"]["owner"] = True
+
+            id_usr = int(item_user["fields"]["user_register"])
+            user =list(models.UserProfile.objects.filter(id = id_usr).values('person__name', 'person__last_name'))
+            user_name = user[0].get('person__name')
+            user_lastname =  user[0].get('person__last_name')
+            item_user["fields"]["owner_publication"] = False
+            item_user["fields"]["owner_commet"] = False
+            item_user["fields"]["user_name"] = user_name
+            item_user["fields"]["user_lastname"] = user_lastname
+
+            #esta en lista el duenio de la publicacion
+            if id_usr == owner_publication.user_register.id :
+                in_list_owner = True
+                item_user["fields"]["owner_publication"] = True
+
+            #esta en lista el duenio del comentario
+            if owner_commet is not None and id_usr == owner_commet.user_register.id :
+                item_user["fields"]["owner_commet"] = True
+
+
+        #Verificamos que el que el que realizo la publicacion se encuentre en la lista.
+        if not in_list_owner and obj.user_register != owner_publication.user_register:
+            json_owner = {"fields": {"user_register": obj.publication.user_register.id, "user_lastname": obj.publication.user_register.person.last_name,
+                          "user_name" : obj.publication.user_register.person.name, "owner" : True}}
+            users_received.append(json_owner)
+
 
         return  users_received
 
