@@ -394,7 +394,7 @@ class ActionSerializer(serializers.ModelSerializer):
         #Verificamos que el que el que realizo la publicacion se encuentre en la lista.
         if not in_list_owner and obj.user_register != owner_publication.user_register:
             json_owner = {"fields": {"user_register": obj.publication.user_register.id, "user_lastname": obj.publication.user_register.person.last_name,
-                          "user_name" : obj.publication.user_register.person.name, "owner" : True}}
+                          "user_name" : obj.publication.user_register.person.name, "owner_publication" : True, "owner_commet": False}}
             users_received.append(json_owner)
 
 
