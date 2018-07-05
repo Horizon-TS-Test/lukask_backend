@@ -31,6 +31,34 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
+class ProvinceViewSet(viewsets.ModelViewSet):
+    """
+       HANDLES CREATING, READING AND UPDATING PROVINCE.
+       """
+    serializer_class = serializers.ProvinceSerializer
+    queryset = models.Province.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_province')
+
+
+class CantonViewSet(viewsets.ModelViewSet):
+    """
+    HANDLES CREATING, READING AND UPDATING CANTON.
+    """
+    serializer_class = serializers.CantonSerializer
+    queryset = models.Canton.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_canton')
+
+class ParishViewSet(viewsets.ModelViewSet):
+    """
+    HANDLES CREATING, READING AND UPDATING TYPEACTION.
+    """
+    serializer_class = serializers.ParishSerializer
+    queryset = models.Parish.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_parish')
+
 
 class PersonViewSet(viewsets.ModelViewSet):
     """
@@ -77,7 +105,7 @@ class LoginViewSet(viewsets.ViewSet):
 
 class TypeActionViewSet(viewsets.ModelViewSet):
     """
-    HANDLES CREATING, READING AND UPDATING TODOS.
+    HANDLES CREATING, READING AND UPDATING TYPEACTION.
     """
     serializer_class = serializers.TypeActionSerializer
     queryset = models.TypeAction.objects.all()

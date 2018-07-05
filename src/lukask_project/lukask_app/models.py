@@ -77,6 +77,44 @@ class UserProfileManager(BaseUserManager):
 #--------------------------------------------------------------------------------------#
 #---------------DEFINICION DE MODELOS DE BASE DE DATOS PARA APLICACION LUKASK----------#
 #--------------------------------------------------------------------------------------#
+class Province(models.Model):
+    """
+    MODELO PROVINCIA QUE REPRESENTA A LA TABLA lukask_app_province DE LA BASE DE DATOS LUKASK_DB
+    """
+    id_province = models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable=False)
+    description_province = models.CharField(max_length=100, unique=True)
+    date_register = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return  self.description_province
+
+
+class Canton(models.Model):
+    """
+    MODELO CANTON QUE REPRESENTA A LA TABLA lukask_app_canton DE LA BASE DE DATOS LUKASK_DB
+    """
+    id_canton = models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable=False)
+    description_canton = models.CharField(max_length=100, unique=True)
+    date_register = models.DateTimeField(auto_now_add=True)
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return  self.description_canton
+
+
+class Parish(models.Model):
+    """
+    MODELO CANTON QUE REPRESENTA A LA TABLA lukask_app_canton DE LA BASE DE DATOS LUKASK_DB
+    """
+    id_parish = models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable=False)
+    description_parish = models.CharField(max_length=100, unique=True)
+    date_register = models.DateTimeField(auto_now_add=True)
+    canton = models.ForeignKey(Canton, on_delete=models.CASCADE, null=True)
+
+    def __str__(self):
+        return self.description_parish
+
+
 class Person(models.Model):
     """
     MODELO PERSON QUE REPRESENTA A LA TABLA lukask_app_person EN LA DB.
@@ -93,6 +131,7 @@ class Person(models.Model):
     birthdate =  models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
+    parish      = models.ForeignKey(Parish, on_delete = models.CASCADE, null = True)
     #user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     #user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pr")
 
@@ -413,11 +452,13 @@ class Notification(models.Model):
 
 class NotificationReceived(models.Model):
     """
-    MODELO NOTIFICAIONES RECIBIDAS QUE REPRESENTA A LA TABLA lukask_app_notificationreceived DE LA LUKASK_DB
+    MODELO NOTIFICAIONES RECIBIDAS QUE REPRESENTA A LA TABLA lukask_app_notificationreceived DE LA BD LUKASK_DB
     """
     description_notif_rec       = models.CharField(max_length=100, null = True)
     user_received               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name='userreceived')
     notification                = models.ForeignKey(Notification, on_delete=models.CASCADE, null=True, related_name='notification')
     date_register               = models.DateTimeField(null = True)
     active                      = models.BooleanField(default=True)
+
+
 
