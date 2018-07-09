@@ -96,7 +96,7 @@ class Canton(models.Model):
     id_canton = models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable=False)
     description_canton = models.CharField(max_length=100, unique=True)
     date_register = models.DateTimeField(auto_now_add=True)
-    province = models.ForeignKey(Province, on_delete=models.CASCADE, null=True)
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, null=True, related_name = "cantones_p")
 
     def __str__(self):
         return  self.description_canton
@@ -109,7 +109,7 @@ class Parish(models.Model):
     id_parish = models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable=False)
     description_parish = models.CharField(max_length=100, unique=True)
     date_register = models.DateTimeField(auto_now_add=True)
-    canton = models.ForeignKey(Canton, on_delete=models.CASCADE, null=True)
+    canton = models.ForeignKey(Canton, on_delete=models.CASCADE, null=True, related_name = "parish_c")
 
     def __str__(self):
         return self.description_parish

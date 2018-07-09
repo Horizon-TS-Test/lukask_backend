@@ -10,19 +10,61 @@ class ProvinceSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZERIALIZADORA PARA MODELO PROVINCE
     """
+    cantons = serializers.SerializerMethodField()
+
     class Meta:
         model  = models.Province
-        fields = ('id_province', 'description_province', 'date_register')
+        fields = ('id_province', 'description_province', 'date_register', 'cantons')
         read_only_fields = ('data_register', )
+
+
+    def get_cantons(self, obj):
+        """
+        Obtenemos todos las parroquias del canton
+        :param obj:
+        :return:
+        """
+        cantons_data = models.Canton.objects.filter(province = obj.id_province)
+        data_province   = []
+
+        for item_canton in cantons_data:
+            item_json = '{}'
+            item_json = json.loads(item_json)
+            item_json["description_canton"]= item_canton.description_canton
+            item_json["id_canton"]= item_canton.id_canton
+            data_province.append(item_json)
+
+        return data_province
+
 
 class CantonSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZERIALIZADORA PARA MODELO CANTON
     """
+    parishs = serializers.SerializerMethodField()
     class Meta:
         model  = models.Canton
-        fields = ('id_canton', 'description_canton', 'date_register', 'province')
+        fields = ('id_canton', 'description_canton', 'date_register', 'province', 'parishs')
         read_only_fields = ('data_register', )
+
+    def get_parishs(self, obj):
+        """
+        Obtenemos todos los datos de las parroquias
+        :param obj:
+        :return:
+        """
+        parish_data = models.Parish.objects.filter(canton = obj.id_canton)
+        data_parish = []
+
+        for item_parish in parish_data:
+            item_json = '{}'
+            item_json = json.loads(item_json)
+            item_json["description_"] = item_parish.description_parish
+            item_json["id_canton"] = item_parish.id_parish
+            data_parish.append(item_json)
+
+        return data_parish
+
 
 class ParishSerializer(serializers.ModelSerializer):
     """
