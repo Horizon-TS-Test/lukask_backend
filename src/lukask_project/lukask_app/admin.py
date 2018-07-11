@@ -17,6 +17,9 @@ admin.site.register(models.ActionPublication)
 admin.site.register(models.Multimedia)
 admin.site.register(models.Notification)
 admin.site.register(models.NotificationReceived)
+admin.site.register(models.Province)
+admin.site.register(models.Canton)
+admin.site.register(models.Parish)
 
 
 

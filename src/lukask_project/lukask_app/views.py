@@ -31,6 +31,34 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
+class ProvinceViewSet(viewsets.ModelViewSet):
+    """
+       HANDLES CREATING, READING AND UPDATING PROVINCE.
+       """
+    serializer_class = serializers.ProvinceSerializer
+    queryset = models.Province.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_province')
+
+
+class CantonViewSet(viewsets.ModelViewSet):
+    """
+    HANDLES CREATING, READING AND UPDATING CANTON.
+    """
+    serializer_class = serializers.CantonSerializer
+    queryset = models.Canton.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_canton')
+
+class ParishViewSet(viewsets.ModelViewSet):
+    """
+    HANDLES CREATING, READING AND UPDATING TYPEACTION.
+    """
+    serializer_class = serializers.ParishSerializer
+    queryset = models.Parish.objects.all()
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_parish')
+
 
 class PersonViewSet(viewsets.ModelViewSet):
     """
@@ -77,7 +105,7 @@ class LoginViewSet(viewsets.ViewSet):
 
 class TypeActionViewSet(viewsets.ModelViewSet):
     """
-    HANDLES CREATING, READING AND UPDATING TODOS.
+    HANDLES CREATING, READING AND UPDATING TYPEACTION.
     """
     serializer_class = serializers.TypeActionSerializer
     queryset = models.TypeAction.objects.all()
@@ -279,7 +307,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
     View para gestionar Notificaciones
     """
     serializer_class =  serializers.NotificationSerializer
-    queryset = models.Notification.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    queryset = models.Notification.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_register')
     filter_backends = (filters.SearchFilter,)
     search_fields = ('date_generated_notification')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
@@ -301,8 +329,9 @@ class NotificationReceivedViewSet(viewsets.ModelViewSet):
     View para gestionar Notificaciones
     """
     serializer_class =  serializers.NotificationReceivedSerializer
-    queryset = models.NotificationReceived.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
-    filter_backends = (filters.SearchFilter,)
+    queryset = models.NotificationReceived.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_register')
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('user_received',)
     search_fields = ('notification')
 
     def get_user_register(self, pk):

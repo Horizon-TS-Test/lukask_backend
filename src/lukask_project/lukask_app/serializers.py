@@ -1,13 +1,84 @@
 import datetime
+import json
 
 from rest_framework import serializers
 from .lukask_constants import LukaskConstants
 
 from . import models
 
+class ProvinceSerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZERIALIZADORA PARA MODELO PROVINCE
+    """
+    cantons = serializers.SerializerMethodField()
+
+    class Meta:
+        model  = models.Province
+        fields = ('id_province', 'description_province', 'date_register', 'cantons')
+        read_only_fields = ('data_register', )
+
+
+    def get_cantons(self, obj):
+        """
+        Obtenemos todos las parroquias del canton
+        :param obj:
+        :return:
+        """
+        cantons_data = models.Canton.objects.filter(province = obj.id_province)
+        data_province   = []
+
+        for item_canton in cantons_data:
+            item_json = '{}'
+            item_json = json.loads(item_json)
+            item_json["description_canton"]= item_canton.description_canton
+            item_json["id_canton"]= item_canton.id_canton
+            data_province.append(item_json)
+
+        return data_province
+
+
+class CantonSerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZERIALIZADORA PARA MODELO CANTON
+    """
+    parishs = serializers.SerializerMethodField()
+    class Meta:
+        model  = models.Canton
+        fields = ('id_canton', 'description_canton', 'date_register', 'province', 'parishs')
+        read_only_fields = ('data_register', )
+
+    def get_parishs(self, obj):
+        """
+        Obtenemos todos los datos de las parroquias
+        :param obj:
+        :return:
+        """
+        parish_data = models.Parish.objects.filter(canton = obj.id_canton)
+        data_parish = []
+
+        for item_parish in parish_data:
+            item_json = '{}'
+            item_json = json.loads(item_json)
+            item_json["description_"] = item_parish.description_parish
+            item_json["id_canton"] = item_parish.id_parish
+            data_parish.append(item_json)
+
+        return data_parish
+
+
+class ParishSerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZERIALIZADORA PARA MODELO CANTON
+    """
+    class Meta:
+        model  = models.Parish
+        fields = ('id_parish', 'description_parish', 'date_register', 'canton')
+        read_only_fields = ('data_register', )
+
+
 class PersonSerializer(serializers.ModelSerializer):
     """
-    A SERIALIZER FOR TODO MODEL
+    CLASE SERIALIZER FOR TODO MODEL
     """
     # UNCOMMENT NEXT LINE IF DOMAIN URL IS NOT NEEDED:
     # prod_image = serializers.ImageField(use_url=False)
@@ -15,14 +86,14 @@ class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Person
         fields = ('id_person', 'age', 'identification_card', 'name', 'last_name', 'telephone', 'cell_phone', 'birthdate',
-                  'address', 'active', 'date_register', 'date_update')
+                  'address', 'active', 'date_register', 'date_update', 'parish')
         read_only_fields = ('active', 'date_register', 'date_update')
 
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """
-    CALSE SERIALIZABLE PARA  OBJECTS USERPROFILE
+    CLASE SERIALIZABLE PARA  OBJECTS USERPROFILE
     """
     person = PersonSerializer()
     #personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
@@ -68,6 +139,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.person.cell_phone              = person.get("cell_phone", instance.person.cell_phone)
         instance.person.birthdate               = person.get("birthdate", instance.person.birthdate)
         instance.person.address                 = person.get("address", instance.person.address)
+        instance.person.parish                  = person.get("parish", instance.person.parish)
         instance.person.active                  = validated_data.get('is_active', instance.is_active)
         instance.person.date_update             = datetime.datetime.now()
         instance.person.save()
@@ -255,13 +327,15 @@ class ActionSerializer(serializers.ModelSerializer):
     media_file = serializers.FileField(write_only=True, source="multimedia.media_file", required=False)
     mediosactionPub = MultimediaSerializer(read_only=True, many=True)
     user_register = UserProfileSerializer(read_only=True)
-    users_that_commnet = serializers.SerializerMethodField()
+    receivers = serializers.SerializerMethodField()
+    pub_owner = serializers.SerializerMethodField()
+    action_parent_owner = serializers.SerializerMethodField()
 
     class Meta:
         model = models.ActionPublication
         fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'type_action',
-                  'publication','action_parent', 'active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
-                  'user_register', 'users_that_commnet')
+                  'publication', 'pub_owner', 'action_parent', 'action_parent_owner','active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
+                  'user_register', 'receivers')
         read_only_fields = ('date_register', 'user_register')
 
 
@@ -312,10 +386,14 @@ class ActionSerializer(serializers.ModelSerializer):
         return _action_publication_update_or_create
 
 
-    def get_users_that_commnet(self, obj):
+    def get_receivers(self, obj):
 
         from django.core import serializers
         users_register = None
+
+        #Owners de la publicacion y comentario
+        owner_publication = obj.publication
+        owner_commet = None
 
         #Si es una comentario a la Publicacio
         if obj.publication is not None and obj.action_parent is None:
@@ -326,17 +404,103 @@ class ActionSerializer(serializers.ModelSerializer):
 
         #Si es una respuesta de un comentario
         elif obj.publication is not None and obj.action_parent is not None:
+
+            owner_commet = obj.action_parent
             users_register = models.ActionPublication.objects.filter(
                 type_action__description_action=LukaskConstants.TYPE_ACTION_COMMENTS,
                 publication=obj.publication, action_parent = obj.action_parent).exclude(user_register__id=obj.user_register.id).order_by(
                 'user_register').distinct('user_register')
 
+            #usuarios a notificar
+            users_register = list(users_register)
+            if not users_register and obj.user_register != owner_commet.user_register:
+                users_register.append(owner_commet)
+            elif users_register:
+
+                #Validamos que el usuario creador dela notificcion este en la lista
+                user_owner_in_notif = next((item for item in users_register if  item.user_register == owner_commet.user_register), None)
+                users_register.append(owner_commet)
+                print ("user_owner_in_notif....", user_owner_in_notif)
+
         #Todos los acciones que interactuan con la publicacion
         else:
             users_register = models.ActionPublication.objects.filter(publication = obj.publication).exclude(
                 user_register__id=obj.user_register.id).order_by('user_register').distinct('user_register')
-        print ("users_register......", users_register)
-        return  serializers.serialize('json', users_register, fields=('user_register',))
+
+
+        #Validamos si existen  usuarios que han comentado
+        data_json = None
+        if not users_register and obj.user_register != owner_publication.user_register:
+            list_pub = []
+            list_pub.append(obj.publication)
+            data_json = serializers.serialize('json', list_pub, fields =('user_register',))
+        else :
+            data_json = serializers.serialize('json', users_register, fields=('user_register',))
+
+
+        #Convetimos a formato Json
+        users_received = json.loads(data_json)
+        
+        #Validamos propietario del la publicacion
+        in_list_owner = False
+        for item_user in users_received:
+
+            id_usr = int(item_user["fields"]["user_register"])
+            #user =list(models.UserProfile.objects.filter(id = id_usr).values('person__name', 'person__last_name'))
+            #user_name = user[0].get('person__name')
+            #user_lastname =  user[0].get('person__last_name')
+            item_user["fields"]["owner_publication"] = False
+            item_user["fields"]["owner_commet"] = False
+            #item_user["fields"]["user_name"] = user_name
+            #item_user["fields"]["user_lastname"] = user_lastname
+
+            #esta en lista el duenio de la publicacion
+            if id_usr == owner_publication.user_register.id :
+                in_list_owner = True
+                item_user["fields"]["owner_publication"] = True
+
+            #esta en lista el duenio del comentario
+            if owner_commet is not None and id_usr == owner_commet.user_register.id :
+                item_user["fields"]["owner_commet"] = True
+
+
+        #Verificamos que el que el que realizo la publicacion se encuentre en la lista.
+        if not in_list_owner and obj.user_register != owner_publication.user_register:
+            json_owner = {"fields": {"user_register": obj.publication.user_register.id, "user_lastname": obj.publication.user_register.person.last_name,
+                          "user_name" : obj.publication.user_register.person.name, "owner_publication" : True, "owner_commet": False}}
+            users_received.append(json_owner)
+
+
+        return  users_received
+
+    def get_action_parent_owner(self, obj):
+        """
+        Obtenemos los datos de la accion padre
+        :param obj:
+        :return: format_action_parent
+        """
+        format_action_parent = '{}'
+        format_action_parent  = json.loads(format_action_parent)
+        if obj.action_parent:
+            format_action_parent["owner"] = True
+            format_action_parent["id"] = obj.action_parent.user_register.id
+            format_action_parent["user_name"] = obj.action_parent.user_register.person.name
+            format_action_parent["user_lastname"] = obj.action_parent.user_register.person.last_name
+        return  format_action_parent
+
+    def get_pub_owner(self, obj):
+        """
+        Obtenemos los datos la publicacion
+        :param obj:
+        :return: format_publication
+        """
+        format_publication = '{}'
+        format_publication = json.loads(format_publication)
+        format_publication["user_id"] = obj.publication.user_register.id
+        format_publication["user_name"] = obj.publication.user_register.person.name
+        format_publication["user_lastname"] = obj.publication.user_register.person.last_name
+        format_publication["owner"] = True
+        return format_publication
 
 
 class PublicationSerializer(serializers.ModelSerializer):
@@ -420,9 +584,11 @@ class NotificationReceivedSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZADORA PARA EL OBJETO NOTIFICATIONRECEIVED CRUD
     """
+    user_emit = UserProfileSerializer(read_only = True, source = "notification.user_register")
+    url       = serializers.CharField(read_only = True, source = "notification.url")
     class Meta:
         model = models.NotificationReceived
-        fields  = ('description_notif_rec', 'user_received', 'notification', 'date_register')
+        fields  = ('description_notif_rec', 'user_received', 'notification', 'date_register', 'url', 'user_emit')
         read_only_fields = ('date_register',)
 
 
@@ -435,16 +601,18 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model  = models.Notification
-        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated_notification', 'user_register','active', 'users_notificated')
+        fields = ('id_notification', 'description_notification', 'date_register', 'date_generated', 'url', 'user_register','active', 'users_notificated')
         read_only_fields = ('date_register', 'active')
 
     def create(self, validated_data):
         print("validated_data", validated_data)
+        date_generated  = validated_data.get('date_generated', None)
         notifs_received = validated_data.pop("users_notificated", None)
         notification =  models.Notification.objects.create(**validated_data)
+        print ("date_generated", date_generated)
         if notifs_received is not None:
             for notif_received in notifs_received:
-                models.NotificationReceived.objects.create(date_register = datetime.datetime.now(), notification = notification, **notif_received)
+                models.NotificationReceived.objects.create(date_register = date_generated, notification = notification, **notif_received)
         return notification
 
 
