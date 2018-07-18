@@ -519,7 +519,7 @@ class PublicationSerializer(serializers.ModelSerializer):
 
    class Meta:
       model = models.Publication
-      fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register',
+      fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register', 'is_trans', 'trans_done',
                 'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active',
                 'type_publication_detail', 'activity', 'user_update', 'address', 'medios', 'medios_data', 'user_register', 'count_relevance',
                 'user_relevance')
@@ -555,6 +555,8 @@ class PublicationSerializer(serializers.ModelSerializer):
         instance.type_publication = validated_data.get("type_publication", instance.type_publication)
         instance.address        = validated_data.get("address", instance.address)
         instance.activity = validated_data.get("activity", instance.activity)
+        instance.is_trans  = validated_data.get("is_trans", instance.is_trans)
+        instance.trans_done = validated_data.get("trans_done", instance.trans_done)
         instance.location  = validated_data.get("location", instance.location)
         instance.save()
         return instance
