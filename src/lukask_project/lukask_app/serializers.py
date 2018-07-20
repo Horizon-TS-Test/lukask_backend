@@ -109,11 +109,18 @@ class UserProfileSerializer(serializers.ModelSerializer):
         """
         _data_person = validated_data.pop('person')
         person = models.Person.objects.create(**_data_person)
-        user = models.UserProfile(
-            email= validated_data['email'],
-            person= person,
-            media_profile = validated_data['media_profile']
-        )
+        media_image = validated_data.get('media_profile', None)
+        if media_image is None:
+            user = models.UserProfile(
+                email= validated_data['email'],
+                person= person
+            )
+        else :
+            user = models.UserProfile(
+                email=validated_data['email'],
+                person=person,
+                media_profile= media_image
+            )
 
         user.set_password(validated_data['password'])
         user.save()

@@ -22,7 +22,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = serializers.UserProfileSerializer
-    permission_classes = (permissions.UpdateOwnProfile, IsAuthenticated)
+    permission_classes = (permissions.UpdateOwnProfile,)
     queryset = models.UserProfile.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('email',)
