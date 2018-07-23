@@ -402,7 +402,7 @@ class ActionSerializer(serializers.ModelSerializer):
         owner_publication = obj.publication
         owner_commet = None
 
-        #Si es una comentario a la Publicacio
+        #Si es una comentario a la Publicacion
         if obj.publication is not None and obj.action_parent is None:
             users_register =  models.ActionPublication.objects.filter(
                 type_action__description_action =  LukaskConstants.TYPE_ACTION_COMMENTS,
@@ -431,6 +431,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
         #Todos los acciones que interactuan con la publicacion
         else:
+            print("ultima opcion de consulta")
             users_register = models.ActionPublication.objects.filter(publication = obj.publication).exclude(
                 user_register__id=obj.user_register.id).order_by('user_register').distinct('user_register')
 

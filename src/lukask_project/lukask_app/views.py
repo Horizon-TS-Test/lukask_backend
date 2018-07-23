@@ -31,6 +31,19 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
+    def get_queryset(self):
+
+        req = self.request
+        qr_user_rel_pub = req.query_params.get(LukaskConstants.USERS_RELEVANCE_PUBLICATION)
+        qr_user_rel_com = req.query_params.get(LukaskConstants.USERS_RELEVANCE_COMMENT)
+
+        if qr_user_rel_pub is not None:
+            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__publication = qr_user_rel_pub)
+        if qr_user_rel_com is not None:
+            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__id_action = qr_user_rel_com)
+        return  models.UserProfile.objects.filter(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+
+
 class ProvinceViewSet(viewsets.ModelViewSet):
     """
        HANDLES CREATING, READING AND UPDATING PROVINCE.
@@ -339,3 +352,4 @@ class NotificationReceivedViewSet(viewsets.ModelViewSet):
             return models.UserProfile.objects.get(pk=pk)
         except models.UserProfile.DoesNotExist:
             raise Http404
+
