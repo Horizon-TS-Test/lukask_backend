@@ -171,6 +171,9 @@ class ActionViewSet(viewsets.ModelViewSet):
         elif qrOp == LukaskConstants.FILTERS_ACTION_COMMENTS:
             return models.ActionPublication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(~Q(action_parent=None)).order_by('-date_register')
 
+    def get_serializer_context(self):
+        return {'user': self.request.user.email}
+
 class PriorityPublicationViewSet(viewsets.ModelViewSet):
     """"
     HANDLES CREATING, READING AND UPDATING TODOS.

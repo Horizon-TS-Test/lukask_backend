@@ -337,12 +337,14 @@ class ActionSerializer(serializers.ModelSerializer):
     receivers = serializers.SerializerMethodField()
     pub_owner = serializers.SerializerMethodField()
     action_parent_owner = serializers.SerializerMethodField()
+    count_relevance = serializers.SerializerMethodField()
+    user_relevance = serializers.SerializerMethodField()
 
     class Meta:
         model = models.ActionPublication
         fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'type_action',
                   'publication', 'pub_owner', 'action_parent', 'action_parent_owner','active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
-                  'user_register', 'receivers')
+                  'user_register', 'receivers', 'count_relevance', 'user_relevance')
         read_only_fields = ('date_register', 'user_register')
 
 
@@ -437,8 +439,8 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
         #Validamos si existen  usuarios que han comentado
-        data_json = None
-        if not users_register and obj.user_register != owner_publication.user_register:
+        data_json = '{}'
+        if not users_register and owner_publication is not None and obj.user_register != owner_publication.user_register:
             list_pub = []
             list_pub.append(obj.publication)
             data_json = serializers.serialize('json', list_pub, fields =('user_register',))
@@ -454,13 +456,10 @@ class ActionSerializer(serializers.ModelSerializer):
         for item_user in users_received:
 
             id_usr = int(item_user["fields"]["user_register"])
-            #user =list(models.UserProfile.objects.filter(id = id_usr).values('person__name', 'person__last_name'))
-            #user_name = user[0].get('person__name')
-            #user_lastname =  user[0].get('person__last_name')
+
             item_user["fields"]["owner_publication"] = False
             item_user["fields"]["owner_commet"] = False
-            #item_user["fields"]["user_name"] = user_name
-            #item_user["fields"]["user_lastname"] = user_lastname
+
 
             #esta en lista el duenio de la publicacion
             if id_usr == owner_publication.user_register.id :
@@ -472,8 +471,8 @@ class ActionSerializer(serializers.ModelSerializer):
                 item_user["fields"]["owner_commet"] = True
 
 
-        #Verificamos que el que el que realizo la publicacion se encuentre en la lista.
-        if not in_list_owner and obj.user_register != owner_publication.user_register:
+        #Verificamos que el que realizo la publicacion se encuentre en la lista.
+        if not in_list_owner and  owner_publication is not None and obj.user_register != owner_publication.user_register:
             json_owner = {"fields": {"user_register": obj.publication.user_register.id, "user_lastname": obj.publication.user_register.person.last_name,
                           "user_name" : obj.publication.user_register.person.name, "owner_publication" : True, "owner_commet": False}}
             users_received.append(json_owner)
@@ -504,11 +503,35 @@ class ActionSerializer(serializers.ModelSerializer):
         """
         format_publication = '{}'
         format_publication = json.loads(format_publication)
-        format_publication["user_id"] = obj.publication.user_register.id
-        format_publication["user_name"] = obj.publication.user_register.person.name
-        format_publication["user_lastname"] = obj.publication.user_register.person.last_name
-        format_publication["owner"] = True
+        if obj.publication is not None:
+            format_publication["user_id"] = obj.publication.user_register.id
+            format_publication["user_name"] = obj.publication.user_register.person.name
+            format_publication["user_lastname"] = obj.publication.user_register.person.last_name
+            format_publication["owner"] = True
         return format_publication
+
+    def get_count_relevance(self, obj):
+        """
+        Obtiene la cantidad de usuarios que dieron relevancia a una accion
+        :param obj:
+        :return:
+        """
+        return models.ActionPublication.objects.filter(action_parent = obj, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE).exclude(action_parent = None).count()
+
+    def get_user_relevance(self, obj):
+        """
+        Verifica que el usuario en sesion, dio relevancia a al comentario, este proceso lo hace registro por registro.
+        :param obj:
+        :return: boolean
+        """
+        user = self.context.get("user")
+        print ("user", user)
+        action = models.ActionPublication.objects.filter(action_parent = obj, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, user_register__email = user,
+                                                         active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+        print  ("action", action)
+        if not action:
+            return False
+        return True
 
 
 class PublicationSerializer(serializers.ModelSerializer):
