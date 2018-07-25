@@ -38,9 +38,10 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         qr_user_rel_com = req.query_params.get(LukaskConstants.USERS_RELEVANCE_COMMENT)
 
         if qr_user_rel_pub is not None:
-            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__publication = qr_user_rel_pub)
+            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__publication = qr_user_rel_pub, actionUserReg__active = LukaskConstants.LOGICAL_STATE_ACTIVE)
         if qr_user_rel_com is not None:
-            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__id_action = qr_user_rel_com)
+            print ("qr_user_rel_com ", qr_user_rel_com)
+            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__action_parent__id_action = qr_user_rel_com, actionUserReg__active = LukaskConstants.LOGICAL_STATE_ACTIVE)
         return  models.UserProfile.objects.filter(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
 

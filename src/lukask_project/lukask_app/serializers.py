@@ -135,6 +135,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.email                          = validated_data.get('email', instance.email)
         instance.media_profile                  = validated_data.get('media_profile', instance.media_profile)
         instance.is_active                      = validated_data.get('is_active', instance.is_active)
+        instance.is_trans                       = validated_data.get('is_trans', instance.is_trans)
+        instance.trans_done                     = validated_data.get('trans_done', instance.trans_done)
         instance.date_update                    = datetime.datetime.now()
         if validated_data.get('password') is not None:
             instance.set_password(validated_data.get('password', instance.password))
@@ -355,17 +357,19 @@ class ActionSerializer(serializers.ModelSerializer):
         :param validated_data:
         :return:
         """
+        print ("validated_data....", validated_data)
         _user_register = validated_data.get('user_register')
         _publication = validated_data.get('publication')
         _type_action = validated_data.get('type_action')
+        _action_parent_id = validated_data.get('action_parent')
         _action_publication_update_or_create = None
 
-        if _type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE:
+        if _type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE and _action_parent_id is not None:
 
-            #Valia si existe ya alguna accion de tipo relevancia
+            #Valia si existe ya alguna accion de tipo relevancia sobre el comentario
             try:
-                _action_publication_update_or_create = models.ActionPublication.objects.get(user_register = _user_register, publication = _publication,
-                                                                                        type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE)
+                _action_publication_update_or_create = models.ActionPublication.objects.get(user_register = _user_register, action_parent = _action_parent_id,
+                                                                                        type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, publication = None)
 
                 #Actualiza
                 _action_publication_update_or_create.date_update = datetime.datetime.now()
@@ -376,12 +380,35 @@ class ActionSerializer(serializers.ModelSerializer):
 
             except models.ActionPublication.DoesNotExist:
 
-                #Crea
+                #Crea registro
                 _action_publication_update_or_create = models.ActionPublication()
                 for key, value in validated_data.items():
                     setattr(_action_publication_update_or_create, key, value)
                 _action_publication_update_or_create.save()
                 return  _action_publication_update_or_create
+
+        elif _type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE and _publication is not None :
+
+            # Valia si existe ya alguna accion de tipo relevancia sobre la publicacion
+            try:
+                _action_publication_update_or_create = models.ActionPublication.objects.get(
+                    user_register=_user_register, type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, publication= _publication)
+
+                # Actualiza
+                _action_publication_update_or_create.date_update = datetime.datetime.now()
+                _action_publication_update_or_create.user_update = _user_register
+                _action_publication_update_or_create.active = validated_data.get('active', False)
+                _action_publication_update_or_create.save()
+                return _action_publication_update_or_create
+
+            except models.ActionPublication.DoesNotExist:
+
+                # Crea registro
+                _action_publication_update_or_create = models.ActionPublication()
+                for key, value in validated_data.items():
+                    setattr(_action_publication_update_or_create, key, value)
+                _action_publication_update_or_create.save()
+                return _action_publication_update_or_create
 
         else:
 
@@ -396,6 +423,11 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
     def get_receivers(self, obj):
+        """
+
+        :param obj:
+        :return:
+        """
 
         from django.core import serializers
         users_register = None
@@ -423,6 +455,7 @@ class ActionSerializer(serializers.ModelSerializer):
             #usuarios a notificar
             users_register = list(users_register)
             if not users_register and obj.user_register != owner_commet.user_register:
+
                 users_register.append(owner_commet)
             elif users_register:
 
@@ -450,7 +483,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
         #Convetimos a formato Json
         users_received = json.loads(data_json)
-        
+
         #Validamos propietario del la publicacion
         in_list_owner = False
         for item_user in users_received:
@@ -462,7 +495,7 @@ class ActionSerializer(serializers.ModelSerializer):
 
 
             #esta en lista el duenio de la publicacion
-            if id_usr == owner_publication.user_register.id :
+            if owner_publication is not None and id_usr == owner_publication.user_register.id :
                 in_list_owner = True
                 item_user["fields"]["owner_publication"] = True
 
@@ -516,7 +549,7 @@ class ActionSerializer(serializers.ModelSerializer):
         :param obj:
         :return:
         """
-        return models.ActionPublication.objects.filter(action_parent = obj, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE).exclude(action_parent = None).count()
+        return models.ActionPublication.objects.filter(action_parent = obj, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(action_parent = None).count()
 
     def get_user_relevance(self, obj):
         """
@@ -598,7 +631,7 @@ class PublicationSerializer(serializers.ModelSerializer):
        :param obj:
        :return: interger
        """
-       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE).exclude(publication = None).count()
+       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(publication = None).count()
 
    def get_user_relevance(self, obj):
        """
@@ -608,7 +641,7 @@ class PublicationSerializer(serializers.ModelSerializer):
        """
        user = self.context.get("user")
        publication = obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, user_register__email = user,
-                                                  action_parent = None, active = True).exclude(publication = None)
+                                                  action_parent = None, active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(publication = None)
        if not publication:
            return False
        return True
