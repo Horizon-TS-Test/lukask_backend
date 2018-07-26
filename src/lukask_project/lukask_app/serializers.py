@@ -347,7 +347,7 @@ class ActionSerializer(serializers.ModelSerializer):
         fields = ('id_action', 'description', 'date_register', 'date_update', 'user_update', 'type_action',
                   'publication', 'pub_owner', 'action_parent', 'action_parent_owner','active', 'mediosactionPub', 'name_file', 'format_multimedia', 'media_file',
                   'user_register', 'receivers', 'count_relevance', 'user_relevance')
-        read_only_fields = ('date_register', 'user_register')
+        read_only_fields = ('user_register',)
 
 
     def create(self, validated_data):
@@ -424,60 +424,92 @@ class ActionSerializer(serializers.ModelSerializer):
 
     def get_receivers(self, obj):
         """
-
+        Datos
         :param obj:
         :return:
         """
 
         from django.core import serializers
-        users_register = None
+        users_register = []
 
         #Owners de la publicacion y comentario
         owner_publication = obj.publication
-        owner_commet = None
+        owner_comment = None
 
+        print("obj", obj)
         #Si es una comentario a la Publicacion
-        if obj.publication is not None and obj.action_parent is None:
-            users_register =  models.ActionPublication.objects.filter(
-                type_action__description_action =  LukaskConstants.TYPE_ACTION_COMMENTS,
-                publication = obj.publication, action_parent = None).exclude(user_register__id = obj.user_register.id).order_by(
-                'user_register').distinct('user_register')
+        if obj.publication is not None and obj.action_parent is None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_COMMENTS:
+            print ("Es comentario ..............")
+            users_register =  models.ActionPublication.objects.filter(type_action__description_action =  LukaskConstants.TYPE_ACTION_COMMENTS, publication = obj.publication,
+                                                                      action_parent = None).exclude(user_register__id = obj.user_register.id).order_by(
+                                                                      'user_register').distinct('user_register')
 
         #Si es una respuesta de un comentario
-        elif obj.publication is not None and obj.action_parent is not None:
+        elif obj.publication is not None and obj.action_parent is not None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_COMMENTS:
 
-            owner_commet = obj.action_parent
-            users_register = models.ActionPublication.objects.filter(
-                type_action__description_action=LukaskConstants.TYPE_ACTION_COMMENTS,
-                publication=obj.publication, action_parent = obj.action_parent).exclude(user_register__id=obj.user_register.id).order_by(
-                'user_register').distinct('user_register')
+            print ("es replay.................")
+            owner_comment = obj.action_parent
+            users_register = models.ActionPublication.objects.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_COMMENTS, publication=obj.publication,
+                                                                     action_parent = obj.action_parent).exclude(user_register__id=obj.user_register.id).order_by(
+                                                                    'user_register').distinct('user_register')
 
             #usuarios a notificar
             users_register = list(users_register)
-            if not users_register and obj.user_register != owner_commet.user_register:
+            if not users_register and obj.user_register != owner_comment.user_register:
 
-                users_register.append(owner_commet)
-            elif users_register:
+                users_register.append(owner_comment)
+            elif users_register and obj.user_register != owner_comment.user_register:
 
-                #Validamos que el usuario creador dela notificcion este en la lista
-                user_owner_in_notif = next((item for item in users_register if  item.user_register == owner_commet.user_register), None)
-                users_register.append(owner_commet)
-                print ("user_owner_in_notif....", user_owner_in_notif)
+                #Validamos que el usuario creador del comentario este en la lista
+                user_owner_in_notif = next((item for item in users_register if  item.user_register == owner_comment.user_register), None)
+                if user_owner_in_notif is None:
+                    users_register.append(owner_comment)
 
-        #Todos los acciones que interactuan con la publicacion
-        else:
-            print("ultima opcion de consulta")
-            users_register = models.ActionPublication.objects.filter(publication = obj.publication).exclude(
-                user_register__id=obj.user_register.id).order_by('user_register').distinct('user_register')
+        #Acciones de tipo relevancia sobre la publicacion
+        elif obj.publication is not None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE:
+
+            print("es relevance a publication")
+            users_register = models.ActionPublication.objects.filter(publication = obj.publication, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE,
+                                                                     action_parent = None).exclude(user_register__id=obj.user_register.id, active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('user_register').distinct(
+                                                                    'user_register')
+
+        #Acciones de tipo relevacia sobre el comentario
+        elif obj.publication is None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE:
+
+            print("es relevance al comentarios")
+            users_register = models.ActionPublication.objects.filter(publication = None, type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE,
+                                                                     action_parent=obj.action_parent).exclude(user_register__id=obj.user_register.id, active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('user_register').distinct(
+                                                                     'user_register')
+            owner_comment = obj.action_parent
+            owner_publication = obj.action_parent.publication
+            print ("owner_publication", owner_publication.user_register)
+
+            # usuarios a notificar
+            users_register = list(users_register)
+
+            if not users_register and obj.user_register != owner_comment.user_register:
+
+                users_register.append(owner_comment)
+            elif users_register and obj.user_register != owner_comment.user_register:
+
+                # Validamos que el usuario creador del comentario este en la lista
+                user_owner_in_notif = next(
+                    (item for item in users_register if item.user_register == owner_comment.user_register), None)
+                if user_owner_in_notif is None:
+                    users_register.append(owner_comment)
 
 
-        #Validamos si existen  usuarios que han comentado
+        #Validamos si existen  usuarios que han comentado, este caso se presenta cuando es la primera accion sobre la publicacion o comentario
         data_json = '{}'
+        print ("owner_publication.user_register", owner_publication.user_register.id)
+        print ("obj.user_register", obj.user_register.id)
         if not users_register and owner_publication is not None and obj.user_register != owner_publication.user_register:
+
             list_pub = []
             list_pub.append(obj.publication)
             data_json = serializers.serialize('json', list_pub, fields =('user_register',))
         else :
+
             data_json = serializers.serialize('json', users_register, fields=('user_register',))
 
 
@@ -489,10 +521,8 @@ class ActionSerializer(serializers.ModelSerializer):
         for item_user in users_received:
 
             id_usr = int(item_user["fields"]["user_register"])
-
             item_user["fields"]["owner_publication"] = False
-            item_user["fields"]["owner_commet"] = False
-
+            item_user["fields"]["owner_comment"] = False
 
             #esta en lista el duenio de la publicacion
             if owner_publication is not None and id_usr == owner_publication.user_register.id :
@@ -500,16 +530,15 @@ class ActionSerializer(serializers.ModelSerializer):
                 item_user["fields"]["owner_publication"] = True
 
             #esta en lista el duenio del comentario
-            if owner_commet is not None and id_usr == owner_commet.user_register.id :
-                item_user["fields"]["owner_commet"] = True
+            if owner_comment is not None and id_usr == owner_comment.user_register.id :
+                item_user["fields"]["owner_comment"] = True
 
 
         #Verificamos que el que realizo la publicacion se encuentre en la lista.
         if not in_list_owner and  owner_publication is not None and obj.user_register != owner_publication.user_register:
-            json_owner = {"fields": {"user_register": obj.publication.user_register.id, "user_lastname": obj.publication.user_register.person.last_name,
-                          "user_name" : obj.publication.user_register.person.name, "owner_publication" : True, "owner_commet": False}}
+            json_owner = {"fields": {"user_register": owner_publication.user_register.id, "user_lastname": owner_publication.user_register.person.last_name,
+                          "user_name" : owner_publication.user_register.person.name, "owner_publication" : True, "owner_comment": False}}
             users_received.append(json_owner)
-
 
         return  users_received
 

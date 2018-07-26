@@ -387,7 +387,7 @@ class ActionPublication(models.Model):
     """
 
     id_action               =   models.UUIDField(primary_key = True, default=make_id_model, editable = False, unique=True)
-    date_register           =   models.DateTimeField(auto_now_add = True, null=True)
+    date_register           =   models.DateTimeField(null=True)
     date_update             =   models.DateTimeField(null=True, blank=True)
     description             =   models.CharField(max_length=500, null=True)
     active                  =   models.BooleanField(default=True)
