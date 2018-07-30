@@ -83,13 +83,30 @@ class PersonSerializer(serializers.ModelSerializer):
     # UNCOMMENT NEXT LINE IF DOMAIN URL IS NOT NEEDED:
     # prod_image = serializers.ImageField(use_url=False)
 
+    location = serializers.SerializerMethodField();
     class Meta:
         model = models.Person
         fields = ('id_person', 'age', 'identification_card', 'name', 'last_name', 'telephone', 'cell_phone', 'birthdate',
-                  'address', 'active', 'date_register', 'date_update', 'parish')
+                  'address', 'active', 'date_register', 'date_update', 'parish', 'location')
         read_only_fields = ('active', 'date_register', 'date_update')
 
 
+    def get_location(self, obj):
+        """
+        Metodo para obtener la ubicacion de domicio de la persona
+        :param obj:
+        :return:
+        """
+        location_data  = []
+        if obj.parish:
+            data_formater = {"province": {"id": obj.parish.canton.province.id_province, "description": obj.parish.canton.province.description_province}}
+            location_data.append(data_formater)
+            data_formater = {"canton": {"id": obj.parish.canton.id_canton, "description": obj.parish.canton.description_canton}}
+            location_data.append(data_formater)
+            data_formater = {"parish": {"id": obj.parish.id_parish, "description": obj.parish.description_parish}}
+            location_data.append(data_formater)
+
+        return location_data
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """

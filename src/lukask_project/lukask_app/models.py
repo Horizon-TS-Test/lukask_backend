@@ -131,7 +131,7 @@ class Person(models.Model):
     birthdate =  models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
-    parish      = models.ForeignKey(Parish, on_delete = models.CASCADE, null = True)
+    parish      = models.ForeignKey(Parish, on_delete = models.CASCADE, null = True, related_name = "parish_person")
     #user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     #user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pr")
 
