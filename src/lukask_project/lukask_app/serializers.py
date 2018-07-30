@@ -369,7 +369,7 @@ class ActionSerializer(serializers.ModelSerializer):
             #Valia si existe ya alguna accion de tipo relevancia sobre el comentario
             try:
                 _action_publication_update_or_create = models.ActionPublication.objects.get(user_register = _user_register, action_parent = _action_parent_id,
-                                                                                        type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, publication = None)
+                                                                                        type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, publication = _publication)
 
                 #Actualiza
                 _action_publication_update_or_create.date_update = datetime.datetime.now()
@@ -387,12 +387,12 @@ class ActionSerializer(serializers.ModelSerializer):
                 _action_publication_update_or_create.save()
                 return  _action_publication_update_or_create
 
-        elif _type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE and _publication is not None :
+        elif _type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE and _publication is not None and _action_parent_id is None:
 
             # Valia si existe ya alguna accion de tipo relevancia sobre la publicacion
             try:
                 _action_publication_update_or_create = models.ActionPublication.objects.get(
-                    user_register=_user_register, type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, publication= _publication)
+                    user_register=_user_register, type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, publication= _publication , action_parent = None)
 
                 # Actualiza
                 _action_publication_update_or_create.date_update = datetime.datetime.now()
@@ -466,7 +466,7 @@ class ActionSerializer(serializers.ModelSerializer):
                     users_register.append(owner_comment)
 
         #Acciones de tipo relevancia sobre la publicacion
-        elif obj.publication is not None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE:
+        elif obj.publication is not None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE and obj.action_parent == None:
 
             print("es relevance a publication")
             users_register = models.ActionPublication.objects.filter(publication = obj.publication, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE,
@@ -474,7 +474,7 @@ class ActionSerializer(serializers.ModelSerializer):
                                                                     'user_register')
 
         #Acciones de tipo relevacia sobre el comentario
-        elif obj.publication is None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE:
+        elif obj.publication is not None and obj.type_action.description_action == LukaskConstants.TYPE_ACTION_RELEVANCE and obj.action_parent != None:
 
             print("es relevance al comentarios")
             users_register = models.ActionPublication.objects.filter(publication = None, type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE,
@@ -578,7 +578,8 @@ class ActionSerializer(serializers.ModelSerializer):
         :param obj:
         :return:
         """
-        return models.ActionPublication.objects.filter(action_parent = obj, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(action_parent = None).count()
+        return models.ActionPublication.objects.filter(action_parent = obj, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE,
+                                                       active = LukaskConstants.LOGICAL_STATE_ACTIVE, publication = obj.publication).exclude(action_parent = None).count()
 
     def get_user_relevance(self, obj):
         """
@@ -589,7 +590,7 @@ class ActionSerializer(serializers.ModelSerializer):
         user = self.context.get("user")
         print ("user", user)
         action = models.ActionPublication.objects.filter(action_parent = obj, type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, user_register__email = user,
-                                                         active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+                                                         active = LukaskConstants.LOGICAL_STATE_ACTIVE, publication = obj.publication)
         print  ("action", action)
         if not action:
             return False
@@ -660,7 +661,8 @@ class PublicationSerializer(serializers.ModelSerializer):
        :param obj:
        :return: interger
        """
-       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(publication = None).count()
+       return obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, active = LukaskConstants.LOGICAL_STATE_ACTIVE,
+                                           action_parent = None).count()
 
    def get_user_relevance(self, obj):
        """
@@ -669,8 +671,8 @@ class PublicationSerializer(serializers.ModelSerializer):
        :return: boolean
        """
        user = self.context.get("user")
-       publication = obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, user_register__email = user,
-                                                  action_parent = None, active = LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(publication = None)
+       publication = obj.actionPublication.filter(type_action__description_action=LukaskConstants.TYPE_ACTION_RELEVANCE, user_register__email = user, publication = obj,
+                                                  action_parent = None, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
        if not publication:
            return False
        return True
