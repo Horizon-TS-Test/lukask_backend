@@ -25,7 +25,7 @@ class MultimediaBinding(ResourceBinding):
 
 class ActionPublicationBinding(ResourceBinding):
     model = ActionPublication
-    stream = "comments"
+    stream = "actions"
     serializer_class = ActionSerializer
     queryset = ActionPublication.objects.all()
 

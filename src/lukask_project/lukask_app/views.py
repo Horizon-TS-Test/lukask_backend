@@ -31,6 +31,20 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
+    def get_queryset(self):
+
+        req = self.request
+        qr_user_rel_pub = req.query_params.get(LukaskConstants.USERS_RELEVANCE_PUBLICATION)
+        qr_user_rel_com = req.query_params.get(LukaskConstants.USERS_RELEVANCE_COMMENT)
+
+        if qr_user_rel_pub is not None:
+            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__publication = qr_user_rel_pub, actionUserReg__active = LukaskConstants.LOGICAL_STATE_ACTIVE, actionUserReg__action_parent = None)
+        if qr_user_rel_com is not None:
+            print ("qr_user_rel_com ", qr_user_rel_com)
+            return models.UserProfile.objects.filter(actionUserReg__type_action__description_action = LukaskConstants.TYPE_ACTION_RELEVANCE, actionUserReg__action_parent__id_action = qr_user_rel_com, actionUserReg__active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+        return  models.UserProfile.objects.filter(is_active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+
+
 class ProvinceViewSet(viewsets.ModelViewSet):
     """
        HANDLES CREATING, READING AND UPDATING PROVINCE.
@@ -157,6 +171,9 @@ class ActionViewSet(viewsets.ModelViewSet):
             return models.ActionPublication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(action_parent=None).order_by('-date_register')
         elif qrOp == LukaskConstants.FILTERS_ACTION_COMMENTS:
             return models.ActionPublication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).exclude(~Q(action_parent=None)).order_by('-date_register')
+
+    def get_serializer_context(self):
+        return {'user': self.request.user.email}
 
 class PriorityPublicationViewSet(viewsets.ModelViewSet):
     """"
@@ -339,3 +356,4 @@ class NotificationReceivedViewSet(viewsets.ModelViewSet):
             return models.UserProfile.objects.get(pk=pk)
         except models.UserProfile.DoesNotExist:
             raise Http404
+
