@@ -152,8 +152,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.email                          = validated_data.get('email', instance.email)
         instance.media_profile                  = validated_data.get('media_profile', instance.media_profile)
         instance.is_active                      = validated_data.get('is_active', instance.is_active)
-        instance.is_trans                       = validated_data.get('is_trans', instance.is_trans)
-        instance.trans_done                     = validated_data.get('trans_done', instance.trans_done)
         instance.date_update                    = datetime.datetime.now()
         if validated_data.get('password') is not None:
             instance.set_password(validated_data.get('password', instance.password))
