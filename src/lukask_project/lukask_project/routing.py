@@ -11,7 +11,7 @@ class ChannelApiAppDemultiplexer(WebsocketDemultiplexer):
     consumers = {
         'publication': PublicationBinding.consumer,
         'multimedia' : MultimediaBinding.consumer,
-        'comments'   : ActionPublicationBinding.consumer,
+        'actions'   : ActionPublicationBinding.consumer,
         'notification_received' : NotificationReceivedBinding.consumer
     }
 

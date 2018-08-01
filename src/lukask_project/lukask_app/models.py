@@ -131,7 +131,7 @@ class Person(models.Model):
     birthdate =  models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
-    parish      = models.ForeignKey(Parish, on_delete = models.CASCADE, null = True)
+    parish      = models.ForeignKey(Parish, on_delete = models.CASCADE, null = True, related_name = "parish_person")
     #user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     #user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_pr")
 
@@ -343,7 +343,7 @@ class Publication(models.Model):
     activity = models.ForeignKey('activity', on_delete=models.CASCADE, null=True)  # FK TABLE ACTIVITY
     is_trans = models.BooleanField(default=False)
     trans_done = models.BooleanField(default=False)
-    user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE,  null=True)
+    user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE,  null=True, related_name = 'publicationUserReg')
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_pl")
 
     def __str__(self):
@@ -387,11 +387,11 @@ class ActionPublication(models.Model):
     """
 
     id_action               =   models.UUIDField(primary_key = True, default=make_id_model, editable = False, unique=True)
-    date_register           =   models.DateTimeField(auto_now_add = True, null=True)
+    date_register           =   models.DateTimeField(null=True)
     date_update             =   models.DateTimeField(null=True, blank=True)
     description             =   models.CharField(max_length=500, null=True)
     active                  =   models.BooleanField(default=True)
-    user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    user_register           =   models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='actionUserReg')
     user_update             =   models.ForeignKey(UserProfile, on_delete = models.CASCADE, null=True, related_name = "user_update_an")
     type_action             =   models.ForeignKey(TypeAction, related_name = "typea", on_delete= models.CASCADE, null=True)
     publication             =   models.ForeignKey(Publication,  related_name='actionPublication', on_delete=models.CASCADE, null=True)

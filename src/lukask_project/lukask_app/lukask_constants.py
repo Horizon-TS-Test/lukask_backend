@@ -18,3 +18,5 @@ class LukaskConstants:
     FILTERS_ACTION_CHILDREN             = 'children'
     FILTERS_ACTION_COMMENTS             = 'comments'
     FILTERS_ACTION_REPLIES              = 'replies'
+    USERS_RELEVANCE_PUBLICATION         = 'usrRelPub'
+    USERS_RELEVANCE_COMMENT             = 'usrRelCom'
