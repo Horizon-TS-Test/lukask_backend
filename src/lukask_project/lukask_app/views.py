@@ -128,7 +128,7 @@ class TypeActionViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
-        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+        serializer.save(active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
 
 
