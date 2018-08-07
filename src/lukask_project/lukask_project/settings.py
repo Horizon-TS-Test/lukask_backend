@@ -25,7 +25,7 @@ SECRET_KEY = '8$y=e+2*@5!zz3*67u(t9iub+1ug&&3t!7o12#0=j!1r-^akq)'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['172.31.0.103', '54.233.211.204','ec2-54-233-211-204.sa-east-1.compute.amazonaws.com']
+ALLOWED_HOSTS = ['172.31.0.103', '54.233.211.204','ec2-54-233-211-204.sa-east-1.compute.amazonaws.com', 'back.lukaksarticles.com']
 
 
 # Application definition
