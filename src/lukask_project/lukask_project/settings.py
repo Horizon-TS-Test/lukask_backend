@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '8$y=e+2*@5!zz3*67u(t9iub+1ug&&3t!7o12#0=j!1r-^akq)'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['172.31.0.103', 'ec2-54-207-84-117.sa-east-1.compute.amazonaws.com', '54.207.84.117']
 
@@ -133,7 +133,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/home/ubuntu/horizontech/lukask_backend/src/lukask_project/repositorio_lukask/'
+MEDIA_URL = '/repositorio_lukask/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'repositorio_lukask')
 
 AUTH_USER_MODEL = 'lukask_app.UserProfile'
