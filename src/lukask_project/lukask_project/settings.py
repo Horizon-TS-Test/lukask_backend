@@ -133,15 +133,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-#MEDIA_URL = '/repositorio_lukask/'
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'repositorio_lukask')
-
 MEDIA_URL = '/repositorio_lukask/'
-MEDIA_ROOT = '/vagrant/src/lukask_project/repositorio_lukask/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'repositorio_lukask')
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "repositorio_lukask"),
-]
+#MEDIA_URL = '/repositorio_lukask/'
+#MEDIA_ROOT = '/vagrant/src/lukask_project/repositorio_lukask/'
+
+#STATICFILES_DIRS = [
+ #   os.path.join(BASE_DIR, "repositorio_lukask"),
+#]
 
 AUTH_USER_MODEL = 'lukask_app.UserProfile'
 
