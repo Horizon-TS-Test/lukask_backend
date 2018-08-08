@@ -41,13 +41,13 @@ class CantonSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZERIALIZADORA PARA MODELO CANTON
     """
-    parishs = serializers.SerializerMethodField()
+    parish = serializers.SerializerMethodField()
     class Meta:
         model  = models.Canton
-        fields = ('id_canton', 'description_canton', 'date_register', 'province', 'parishs')
+        fields = ('id_canton', 'description_canton', 'date_register', 'province', 'parish')
         read_only_fields = ('data_register', )
 
-    def get_parishs(self, obj):
+    def get_parish(self, obj):
         """
         Obtenemos todos los datos de las parroquias
         :param obj:
@@ -59,8 +59,8 @@ class CantonSerializer(serializers.ModelSerializer):
         for item_parish in parish_data:
             item_json = '{}'
             item_json = json.loads(item_json)
-            item_json["description_"] = item_parish.description_parish
-            item_json["id_canton"] = item_parish.id_parish
+            item_json["description"] = item_parish.description_parish
+            item_json["id_parroquia"] = item_parish.id_parish
             data_parish.append(item_json)
 
         return data_parish
@@ -93,7 +93,7 @@ class PersonSerializer(serializers.ModelSerializer):
 
     def get_location(self, obj):
         """
-        Metodo para obtener la ubicacion de domicio de la persona
+        Metodo para obtener la ubicacion de domicilio de la persona
         :param obj:
         :return:
         """
@@ -516,8 +516,6 @@ class ActionSerializer(serializers.ModelSerializer):
 
         #Validamos si existen  usuarios que han comentado, este caso se presenta cuando es la primera accion sobre la publicacion o comentario
         data_json = '{}'
-        print ("owner_publication.user_register", owner_publication.user_register.id)
-        print ("obj.user_register", obj.user_register.id)
         if not users_register and owner_publication is not None and obj.user_register != owner_publication.user_register:
 
             list_pub = []
