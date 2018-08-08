@@ -20,3 +20,5 @@ class LukaskConstants:
     FILTERS_ACTION_REPLIES              = 'replies'
     USERS_RELEVANCE_PUBLICATION         = 'usrRelPub'
     USERS_RELEVANCE_COMMENT             = 'usrRelCom'
+    FILTER_PROVINCE                     = 'province'
+    FILTER_CANTON                       = 'canton'
