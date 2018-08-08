@@ -53,6 +53,7 @@ class ProvinceViewSet(viewsets.ModelViewSet):
     queryset = models.Province.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_province')
+    pagination_class = None
 
 
 class CantonViewSet(viewsets.ModelViewSet):
@@ -63,6 +64,22 @@ class CantonViewSet(viewsets.ModelViewSet):
     queryset = models.Canton.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_canton')
+    pagination_class = None
+
+    def get_queryset(self):
+        """
+        Filtros para consultas de cantones de una parroquia.
+        :return: List
+        """
+        req = self.request
+        qrOp = req.query_params.get(LukaskConstants.FILTER_PROVINCE)
+
+        print ("province", qrOp)
+        if qrOp is None:
+            return models.Canton.objects.all()
+        else:
+            return models.Canton.objects.filter(province = qrOp)
+
 
 class ParishViewSet(viewsets.ModelViewSet):
     """
@@ -72,6 +89,21 @@ class ParishViewSet(viewsets.ModelViewSet):
     queryset = models.Parish.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_parish')
+    pagination_class = None
+
+    def get_queryset(self):
+        """
+        Filtros para consultas de parroquias de una provincia.
+        :return: List
+        """
+        req = self.request
+        qrOp = req.query_params.get(LukaskConstants.FILTER_CANTON)
+
+        print ("canton", qrOp)
+        if qrOp is None:
+            return models.Parish.objects.all()
+        else:
+            return models.Parish.objects.filter(canton = qrOp)
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -182,6 +214,7 @@ class PriorityPublicationViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.PriorityPublicationSerializer
     queryset = models.PriorityPublication.objects.all()
     filter_backends = (filters.SearchFilter,)
+
     search_fields = ('description')
 
     authentication_classes = (TokenAuthentication,)
@@ -197,7 +230,7 @@ class TypePublicationViewSet(viewsets.ModelViewSet):
     queryset = models.TypePublication.objects.all()
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description',)
-
+    pagination_class = None
     authentication_classes = (TokenAuthentication,)
 
     def perform_create(self, serializer):
