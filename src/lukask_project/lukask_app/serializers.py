@@ -116,7 +116,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     #personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
     class Meta:
         model = models.UserProfile
-        fields = ('id','email', 'password','media_profile', 'date_update', 'is_active', 'person')
+        fields = ('id','email', 'password','media_profile', 'date_update', 'is_active',  'profile_path', 'person')
         read_only_fields = ("date_uodate",)
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -130,11 +130,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if media_image is None:
             user = models.UserProfile(
                 email= validated_data['email'],
+                profile_path = validated_data['validated_data'],
                 person= person
             )
         else :
             user = models.UserProfile(
                 email=validated_data['email'],
+                profile_path=validated_data['validated_data'],
                 person=person,
                 media_profile= media_image
             )
@@ -151,6 +153,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         person = validated_data.get("person")
         instance.email                          = validated_data.get('email', instance.email)
         instance.media_profile                  = validated_data.get('media_profile', instance.media_profile)
+        instance.profile_path                  = validated_data.get('profile_path', instance.profile_path)
         instance.is_active                      = validated_data.get('is_active', instance.is_active)
         instance.date_update                    = datetime.datetime.now()
         if validated_data.get('password') is not None:
@@ -260,7 +263,7 @@ class MultimediaSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Multimedia
         fields = ('id_publication','format_multimedia', 'id_multimedia', 'name_file', 'description_file', 'media_file',
-                  'date_register', 'date_update', 'active', 'user_update', 'user_register', 'actionPublication')
+                  'date_register', 'date_update', 'active', 'user_update', 'user_register', 'actionPublication', 'media_path')
         read_only_fields = ('user_register', 'actionPublication', 'active')
 
 
@@ -281,7 +284,7 @@ class MultimediaSingleSerializer(serializers.ModelSerializer):
     multimedia = MultimediaSerializer(write_only=True, many=True)
     class Meta:
         model = models.Multimedia
-        fields = ('publication', 'id_multimedia', 'format_multimedia', 'name_file', 'media_file','multimedia', 'active')
+        fields = ('publication', 'id_multimedia', 'format_multimedia', 'name_file', 'media_file','multimedia', 'active', 'media_path')
         read_only_fields = ('format_multimedia', 'id_multimedia', 'name_file', 'media_file', 'active')
 
     def create(self, validated_data):
