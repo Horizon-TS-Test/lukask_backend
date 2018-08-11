@@ -127,16 +127,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
         _data_person = validated_data.pop('person')
         person = models.Person.objects.create(**_data_person)
         media_image = validated_data.get('media_profile', None)
+        _profile_media = validated_data.get('profile_path', None)
         if media_image is None:
             user = models.UserProfile(
                 email= validated_data['email'],
-                profile_path = validated_data['profile_path'],
+                profile_path = _profile_media,
                 person= person
             )
         else :
             user = models.UserProfile(
                 email=validated_data['email'],
-                profile_path = validated_data['profile_path'],
+                profile_path =  _profile_media,
                 person=person,
                 media_profile= media_image
             )
