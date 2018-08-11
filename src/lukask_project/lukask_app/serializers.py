@@ -130,13 +130,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
         if media_image is None:
             user = models.UserProfile(
                 email= validated_data['email'],
-                profile_path = validated_data['validated_data'],
+                profile_path = validated_data['profile_path'],
                 person= person
             )
         else :
             user = models.UserProfile(
                 email=validated_data['email'],
-                profile_path=validated_data['validated_data'],
+                profile_path = validated_data['profile_path'],
                 person=person,
                 media_profile= media_image
             )
