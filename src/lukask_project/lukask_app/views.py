@@ -50,7 +50,7 @@ class ProvinceViewSet(viewsets.ModelViewSet):
        HANDLES CREATING, READING AND UPDATING PROVINCE.
        """
     serializer_class = serializers.ProvinceSerializer
-    queryset = models.Province.objects.all()
+    queryset = models.Province.objects.all().order_by("description_province")
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_province')
     pagination_class = None
@@ -61,7 +61,7 @@ class CantonViewSet(viewsets.ModelViewSet):
     HANDLES CREATING, READING AND UPDATING CANTON.
     """
     serializer_class = serializers.CantonSerializer
-    queryset = models.Canton.objects.all()
+    queryset = models.Canton.objects.all().order_by("description_canton")
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_canton')
     pagination_class = None
@@ -86,7 +86,7 @@ class ParishViewSet(viewsets.ModelViewSet):
     HANDLES CREATING, READING AND UPDATING TYPEACTION.
     """
     serializer_class = serializers.ParishSerializer
-    queryset = models.Parish.objects.all()
+    queryset = models.Parish.objects.all().order_by("description_parish")
     filter_backends = (filters.SearchFilter,)
     search_fields = ('description_parish')
     pagination_class = None
@@ -291,6 +291,20 @@ class PublicationViewSet(viewsets.ModelViewSet):
             serializer.save(user_update = self.request.user)
         except UnreadablePostError:
             raise Http404
+
+    def get_queryset(self):
+        """
+        Filtro para consulta de publicaciones por usuario.
+        :return: List
+        """
+        req = self.request
+        qr = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_USER)
+        print ("qr", qr)
+        if qr is None:
+            return models.Publication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('-date_register')
+        else:
+            print('Else', qr)
+            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, user_register__id = qr).order_by('-date_register')
 
     def get_serializer_context(self):
         return {'user': self.request.user.email}

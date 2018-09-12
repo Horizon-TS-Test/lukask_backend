@@ -97,16 +97,14 @@ class PersonSerializer(serializers.ModelSerializer):
         :param obj:
         :return:
         """
-        location_data  = []
+        data_json = '{}'
+        data_json = json.loads(data_json)
         if obj.parish:
-            data_formater = {"province": {"id": obj.parish.canton.province.id_province, "description": obj.parish.canton.province.description_province}}
-            location_data.append(data_formater)
-            data_formater = {"canton": {"id": obj.parish.canton.id_canton, "description": obj.parish.canton.description_canton}}
-            location_data.append(data_formater)
-            data_formater = {"parish": {"id": obj.parish.id_parish, "description": obj.parish.description_parish}}
-            location_data.append(data_formater)
+            data_json["province"] = json.loads(json.dumps({ "id": str(obj.parish.canton.province.id_province) , "description" : str(obj.parish.canton.province.description_province) }))
+            data_json["canton"] = json.loads(json.dumps({ "id": str(obj.parish.canton.id_canton) , "description" : str(obj.parish.canton.description_canton)}))
+            data_json["parish"] = json.loads(json.dumps({ "id ": str(obj.parish.id_parish) , "description" : str(obj.parish.description_parish)}))
 
-        return location_data
+        return data_json
 
 class UserProfileSerializer(serializers.ModelSerializer):
     """
