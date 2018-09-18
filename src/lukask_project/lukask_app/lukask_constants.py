@@ -22,3 +22,4 @@ class LukaskConstants:
     USERS_RELEVANCE_COMMENT             = 'usrRelCom'
     FILTER_PROVINCE                     = 'province'
     FILTER_CANTON                       = 'canton'
+    FILTER_PUBLICATION_USER             = 'pubUserQr'
