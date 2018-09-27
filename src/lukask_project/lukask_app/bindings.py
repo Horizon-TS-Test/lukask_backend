@@ -1,14 +1,13 @@
-from django.core import serializers
 
 from channels_api.bindings import ResourceBinding
 from channels_api.decorators import detail_action, list_action
 
-from .models import Multimedia
+#from .models import Multimedia
 from .models import Publication
 from .models import ActionPublication
 from .models import NotificationReceived
 from .serializers import PublicationSerializer
-from .serializers import MultimediaSerializer
+#from .serializers import MultimediaSerializer
 from .serializers import ActionSerializer
 from .serializers import NotificationReceivedSerializer
 
@@ -23,7 +22,6 @@ class PublicationBinding(ResourceBinding):
         publication = Publication.objects.get(id_publication = pk)
         serializer_p = PublicationSerializer(publication)
         result =  serializer_p.data
-        print ("result....", result)
         return result, 200
 
     """@list_action()
@@ -32,11 +30,11 @@ class PublicationBinding(ResourceBinding):
         return report, 200"""
 
 
-class MultimediaBinding(ResourceBinding):
+"""class MultimediaBinding(ResourceBinding):
     model = Multimedia
     stream = "multimedia"
     serializer_class = MultimediaSerializer
-    queryset = Multimedia.objects.all()
+    queryset = Multimedia.objects.all()"""
 
 class ActionPublicationBinding(ResourceBinding):
     model = ActionPublication
