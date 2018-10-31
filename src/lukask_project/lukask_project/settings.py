@@ -136,12 +136,12 @@ STATIC_URL = '/static/'
 #MEDIA_URL = '/repositorio_lukask/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-#MEDIA_URL = '/repositorio_lukask/'
-#MEDIA_ROOT = '/vagrant/src/lukask_project/repositorio_lukask/'
+MEDIA_URL = '/repositorio_lukask/'
+MEDIA_ROOT = '/vagrant/src/lukask_project/repositorio_lukask/'
 
-#STATICFILES_DIRS = [
- #   os.path.join(BASE_DIR, "repositorio_lukask"),
-#]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "repositorio_lukask"),
+]
 
 AUTH_USER_MODEL = 'lukask_app.UserProfile'
 
