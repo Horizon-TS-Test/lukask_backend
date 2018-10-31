@@ -135,7 +135,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 #MEDIA_URL = '/repositorio_lukask/'
 #MEDIA_ROOT = os.path.join(BASE_DIR, 'repositorio_lukask')
-
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 MEDIA_URL = '/repositorio_lukask/'
 MEDIA_ROOT = '/vagrant/src/lukask_project/repositorio_lukask/'
 
