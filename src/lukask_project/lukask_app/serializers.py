@@ -152,7 +152,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         person = validated_data.get("person")
         instance.email                          = validated_data.get('email', instance.email)
         instance.media_profile                  = validated_data.get('media_profile', instance.media_profile)
-        instance.profile_path                  = validated_data.get('profile_path', instance.profile_path)
+        instance.profile_path                   = validated_data.get('profile_path', instance.profile_path)
         instance.is_active                      = validated_data.get('is_active', instance.is_active)
         instance.date_update                    = datetime.datetime.now()
         if validated_data.get('password') is not None:
@@ -272,19 +272,11 @@ class MultimediaSingleSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZADORA COMPUESTA PARA EL OBJECTO MULTIMEDIA CRUD
     """
-
-    #latitude = serializers.FloatField(write_only=True, source="publication.latitude")
-    #length = serializers.FloatField(write_only=True, source="publication.length")
-    #detail = serializers.CharField(write_only=True, source="publication.detail")
-    #date_publication = serializers.DateTimeField(write_only = True, source="publication.date_publication")
-    #type_publication = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.TypePublication.objects.all(), source='publication.type_publication')
-    #priority_publication = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.PriorityPublication.objects.all(), source='publication.priority_publication')
-    #user_register_id = serializers.IntegerField(read_only=True, source="user_register.id")
     multimedia = MultimediaSerializer(write_only=True, many=True)
     class Meta:
         model = models.Multimedia
-        fields = ('publication', 'id_multimedia', 'format_multimedia', 'name_file', 'media_file','multimedia', 'active', 'media_path')
-        read_only_fields = ('format_multimedia', 'id_multimedia', 'name_file', 'media_file', 'active')
+        fields = ('publication', 'id_multimedia', 'format_multimedia', 'name_file', 'media_file', 'media_path', 'active', 'multimedia')
+        read_only_fields = ('format_multimedia', 'id_multimedia', 'name_file', 'media_file', 'media_path', 'active')
 
     def create(self, validated_data):
         """
