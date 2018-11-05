@@ -330,8 +330,8 @@ class Publication(models.Model):
     """
 
     id_publication = models.UUIDField(primary_key=True, default=make_id_model, editable=False, unique=True)
-    latitude = models.DecimalField(max_digits=30, decimal_places =3)
-    length = models.DecimalField(max_digits=30, decimal_places =3)
+    latitude = models.DecimalField(max_digits=35, decimal_places =30)
+    length = models.DecimalField(max_digits=35, decimal_places =30)
     location = models.CharField(max_length=60, null=True)
     address  = models.CharField(max_length=100, null=True)
     detail = models.TextField(max_length= 300)
