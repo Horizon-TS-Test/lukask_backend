@@ -23,6 +23,13 @@ class PublicationBinding(ResourceBinding):
         serializer_p = PublicationSerializer(publication)
         result =  serializer_p.data
         return result, 200
+    
+    @detail_action()
+    def custom_update(self, pk, data=None, **kwargs):
+        publication = Publication.objects.get(id_publication = pk)
+        serializer_p = PublicationSerializer(publication)
+        result =  serializer_p.data
+        return result, 200
 
     """@list_action()
     def report(self, data=None, **kwargs):
