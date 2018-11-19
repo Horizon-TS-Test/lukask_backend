@@ -334,6 +334,7 @@ class Publication(models.Model):
     length = models.DecimalField(max_digits=25, decimal_places=20)
     location = models.CharField(max_length=60, null=True)
     address  = models.CharField(max_length=100, null=True)
+    eersa_cliem_id = models.CharField(max_length=60, null=True)
     detail = models.TextField(max_length= 300)
     date_publication = models.DateTimeField(null=True)
     date_register = models.DateTimeField(auto_now_add=True)

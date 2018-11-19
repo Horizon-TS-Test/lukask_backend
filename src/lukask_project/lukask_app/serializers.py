@@ -621,7 +621,7 @@ class PublicationSerializer(serializers.ModelSerializer):
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register', 'is_trans', 'trans_done',
-                'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active',
+                'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active', 'eersa_cliem_id',
                 'type_publication_detail', 'activity', 'user_update', 'address', 'medios', 'medios_data', 'user_register', 'count_relevance',
                 'user_relevance')
       read_only_fields  = ('active', )
