@@ -106,15 +106,40 @@ class PersonSerializer(serializers.ModelSerializer):
 
         return data_json
 
+class ProfileSerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZABLE PARA EL OBJETO PROFILE CRUD
+    """
+    class Meta:
+       model = models.Profile
+       fields = ('id_profile', 'description', 'date_register', 'date_update',
+                  'active', 'user_register', 'user_update', 'users')
+       read_only_fields = ('user_register', 'active', 'date_register')
+
+        
+
+
+class ProfileUserSerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZABLE PARA EL OBJETO PROFILEUSER CRUD
+    """
+    class Meta:
+        model = models.ProfileUser
+        fields = ('date_login', 'date_register', 'date_update', 'active', 'user',
+                  'profile', 'user_register', 'user_update')
+        read_only_fields = ('user_register', 'active', 'date_register')
+
 class UserProfileSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZABLE PARA  OBJECTS USERPROFILE
     """
+    #profusr_user = ProfileUserSerializer(many=True, read_only=True)
+    profiles = serializers.SerializerMethodField()
     person = PersonSerializer()
     #personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
     class Meta:
         model = models.UserProfile
-        fields = ('id','email', 'password','media_profile', 'date_update', 'is_active',  'profile_path', 'person')
+        fields = ('id','email', 'password','media_profile', 'date_update', 'is_active', 'is_admin', 'profile_path', 'person', 'profiles')
         read_only_fields = ("date_uodate",)
         extra_kwargs = {'password': {'write_only': True}}
 
@@ -171,28 +196,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.person.save()
         instance.save()
         return instance
-
-class ProfileSerializer(serializers.ModelSerializer):
-    """
-    CLASE SERIALIZABLE PARA EL OBJETO PROFILE CRUD
-    """
-    class Meta:
-       model = models.Profile
-       fields = ('id_profile', 'description', 'date_register', 'date_update',
-                  'active', 'user_register', 'user_update', 'users')
-
-
-
-class ProfileUserSerializer(serializers.ModelSerializer):
-    """
-    CLASE SERIALIZABLE PARA EL OBJETO PROFILEUSER CRUD
-    """
-    class Meta:
-        model = models.ProfileUser
-        fields = ('date_login', 'date_register', 'date_update', 'active', 'user',
-                  'profile', 'user_register', 'user_update')
-
-
+    
+    def get_profiles(self, obj):
+        print(obj)
 
 class PriorityPublicationSerializer(serializers.ModelSerializer):
     """
@@ -621,7 +627,7 @@ class PublicationSerializer(serializers.ModelSerializer):
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register', 'is_trans', 'trans_done',
-                'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active', 'eersa_cliem_id',
+                'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active', 'eersa_claim_id',
                 'type_publication_detail', 'activity', 'user_update', 'address', 'medios', 'medios_data', 'user_register', 'count_relevance',
                 'user_relevance')
       read_only_fields  = ('active', )

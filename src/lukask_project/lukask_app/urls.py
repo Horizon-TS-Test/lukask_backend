@@ -19,6 +19,8 @@ router.register("notification_received", views.NotificationReceivedViewSet)
 router.register("province", views.ProvinceViewSet)
 router.register("canton", views.CantonViewSet)
 router.register("parish", views.ParishViewSet)
+router.register("profile", views.ProfileViewSet)
+router.register("profile_user", views.ProfileUserViewSet)
 #router.register("singleMultimedia", views.MultimediaSingleAPIView)
 #router.register(r'crearPublicacion', views.PublicationCreateAPIView, base_name='create')
 

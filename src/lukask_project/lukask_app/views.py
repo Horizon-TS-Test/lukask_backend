@@ -404,3 +404,43 @@ class NotificationReceivedViewSet(viewsets.ModelViewSet):
         except models.UserProfile.DoesNotExist:
             raise Http404
 
+class ProfileViewSet(viewsets.ModelViewSet):
+    """
+    View para gestionar profile
+    """
+    serializer_class = serializers.ProfileSerializer
+    queryset = models.Profile.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description')
+    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
+    authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+
+    def get_user_register(self, pk):
+        try:
+            return models.UserProfile.objects.get(pk=pk)
+        except models.UserProfile.DoesNotExist:
+            raise Http404
+
+
+class ProfileUserViewSet(viewsets.ModelViewSet):
+    """
+    View para gestionar profile
+    """
+    serializer_class = serializers.ProfileUserSerializer
+    queryset = models.ProfileUser.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    filter_backends = (filters.SearchFilter,)
+    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
+    authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+
+    def get_user_register(self, pk):
+        try:
+            return models.UserProfile.objects.get(pk=pk)
+        except models.UserProfile.DoesNotExist:
+            raise Http404
+

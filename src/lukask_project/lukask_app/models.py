@@ -166,6 +166,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
@@ -201,6 +202,12 @@ class Profile(models.Model):
                     UserProfile,
                     through='ProfileUser',
                     through_fields=('profile', 'user'))
+    
+    def __str__(self):
+        """
+        DJANGO USES THIS WHEN IT NEEDS TO CONVERT THE OBJECT TO A STRING
+        """
+        return self.description
 
 
 
@@ -214,8 +221,8 @@ class ProfileUser(models.Model):
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='profusr_user')
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='profusr_Profile')
     user_register = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_register_pu")
     user_update = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null = True, related_name = "user_update_pu")
 
@@ -334,7 +341,7 @@ class Publication(models.Model):
     length = models.DecimalField(max_digits=25, decimal_places=20)
     location = models.CharField(max_length=60, null=True)
     address  = models.CharField(max_length=100, null=True)
-    eersa_cliem_id = models.CharField(max_length=60, null=True)
+    eersa_claim_id = models.CharField(max_length=60, null=True)
     detail = models.TextField(max_length= 300)
     date_publication = models.DateTimeField(null=True)
     date_register = models.DateTimeField(auto_now_add=True)
