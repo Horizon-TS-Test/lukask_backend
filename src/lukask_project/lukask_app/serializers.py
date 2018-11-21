@@ -198,8 +198,21 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return instance
     
     def get_profiles(self, obj):
-        print(obj)
-
+        """
+        Metodo que obtiene los datos los perfiles asignados a este usuario.
+        """
+        profiles = list(models.ProfileUser.objects.filter(user = obj.id, active = LukaskConstants.LOGICAL_STATE_ACTIVE))
+        profiles_data = []
+        
+        if len(profiles) > 0 :
+            for item_profile in profiles:
+                item_json = '{}'
+                item_json = json.loads(item_json)
+                item_json['profile'] = item_profile.profile.description
+                item_json['id'] = item_profile.profile.id_profile
+                profiles_data.append(item_json)
+        
+        return profiles_data
 class PriorityPublicationSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZABLE PARA EL OBJETO PRIORITYPUBLICATION CRUD
