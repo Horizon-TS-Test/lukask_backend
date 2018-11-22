@@ -6,6 +6,18 @@ from django.http import HttpResponse
 from .lukask_constants import LukaskConstants
 from . import models
 
+#--------metodos genrales------
+def user_is_admin(obj):
+       """
+       Verificar si el user es admin
+       """
+       is_admin = False
+       profile_admin = models.ProfileUser.objects.filter(profile = LukaskConstants.PROFILE_ADMIN, user = obj.id)
+       if len(profile_admin) > 0 :
+           is_admin = True
+       return is_admin       
+
+
 class ProvinceSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZERIALIZADORA PARA MODELO PROVINCE
@@ -136,6 +148,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     #profusr_user = ProfileUserSerializer(many=True, read_only=True)
     profiles = serializers.SerializerMethodField()
     person = PersonSerializer()
+    is_admin = serializers.SerializerMethodField()
     #personSelect = serializers.PrimaryKeyRelatedField(write_only=True, queryset=models.Person.objects.all(), source='person')
     class Meta:
         model = models.UserProfile
@@ -213,6 +226,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
                 profiles_data.append(item_json)
         
         return profiles_data
+    
+    def get_is_admin(self, obj):
+        return user_is_admin(obj)
+
+
 class PriorityPublicationSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZABLE PARA EL OBJETO PRIORITYPUBLICATION CRUD
@@ -654,7 +672,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         type_pub = validated_data.get('type_publication')
         if str(type_pub.id_type_publication) == LukaskConstants.FILER_TYPEPUB_PUBLICATION:
             
-            if self.user_is_admin(user_reg):
+            if user_is_admin(user_reg):
                 publication_info = models.Publication.objects.create(**validated_data)
                 if medios is not None:
                     if len(medios) > 0:
@@ -725,16 +743,6 @@ class PublicationSerializer(serializers.ModelSerializer):
        if not publication:
            return False
        return True
-
-   def user_is_admin(self, obj):
-       """
-       Verificar si el user es admin
-       """
-       is_admin = False
-       profile_admin = models.ProfileUser.objects.filter(profile = LukaskConstants.PROFILE_ADMIN, user = obj.id)
-       if len(profile_admin) > 0 :
-           is_admin = True
-       return is_admin       
 
 class NotificationReceivedSerializer(serializers.ModelSerializer):
     """

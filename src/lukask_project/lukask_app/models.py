@@ -166,7 +166,6 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=100, unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
     last_login = models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
@@ -217,7 +216,7 @@ class ProfileUser(models.Model):
     MODELO PROFILEUSER REPRESENTA A LA TABLA lukask_app_profileuser DE LA DB LUKASK_DB
     """
 
-    date_login = models.DateTimeField()
+    date_login = models.DateTimeField(null=True, blank=True)
     date_register = models.DateTimeField(auto_now_add=True)
     date_update = models.DateTimeField(null=True, blank=True)
     active = models.BooleanField(default=True)
