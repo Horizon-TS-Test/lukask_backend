@@ -2,8 +2,8 @@ import datetime
 import json
 
 from rest_framework import serializers
+from django.http import HttpResponse
 from .lukask_constants import LukaskConstants
-
 from . import models
 
 class ProvinceSerializer(serializers.ModelSerializer):
@@ -640,26 +640,49 @@ class PublicationSerializer(serializers.ModelSerializer):
    class Meta:
       model = models.Publication
       fields = ('id_publication', 'latitude', 'length', 'detail', 'location', 'date_publication', 'date_register', 'is_trans', 'trans_done',
-                'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active', 'eersa_claim_id',
+                'date_update', 'priority_publication', 'priority_publication_detail', 'type_publication', 'active', 'eersa_claim_id', 'company',
                 'type_publication_detail', 'activity', 'user_update', 'address', 'medios', 'medios_data', 'user_register', 'count_relevance',
                 'user_relevance')
       read_only_fields  = ('active', )
 
    def create(self, validated_data):
-        print("validated_data...........", validated_data)
+        """
+        Metodo para creacion de publicaciones.
+        """
         medios = validated_data.pop('medios_data')
         user_reg = validated_data.get('user_register')
-        publication_info = models.Publication.objects.create(**validated_data)
-        if medios is not None:
-            if len(medios) > 0:
-                print ("con datos para multimedia")
-                for medio in medios:
-                    print("medio .....after insert", medio)
-                    models.Multimedia.objects.create(publication = publication_info, user_register = user_reg,  **medio)
+        type_pub = validated_data.get('type_publication')
+        if str(type_pub.id_type_publication) == LukaskConstants.FILER_TYPEPUB_PUBLICATION:
+            
+            if self.user_is_admin(user_reg):
+                publication_info = models.Publication.objects.create(**validated_data)
+                if medios is not None:
+                    if len(medios) > 0:
+                        print ("con datos para multimedia")
+                        for medio in medios:
+                            print("medio .....after insert", medio)
+                            models.Multimedia.objects.create(publication = publication_info, user_register = user_reg,  **medio)
+                    else:
+                        print ("sin datos para multimedia")
+                        descripcion = validated_data.get('detail')
+                        models.Multimedia.objects.create(format_multimedia  = 'IG', name_file = 'Default', description_file = descripcion[0:48], 
+                        publication = publication_info )
             else:
-                print ("sin datos para multimedia")
-                descripcion = validated_data.get('detail')
-                models.Multimedia.objects.create(format_multimedia  = 'IG', name_file = 'Default', description_file = descripcion[0:48], publication = publication_info )
+
+                raise serializers.ValidationError("No tiene autorización para insertar publicaciones 405")
+        else:
+            
+            publication_info = models.Publication.objects.create(**validated_data)
+            if medios is not None:
+                if len(medios) > 0:
+                    print ("con datos para multimedia")
+                    for medio in medios:
+                        models.Multimedia.objects.create(publication = publication_info, user_register = user_reg,  **medio)
+                else:
+                    print ("sin datos para multimedia")
+                    descripcion = validated_data.get('detail')
+                    models.Multimedia.objects.create(format_multimedia  = 'IG', name_file = 'Default', description_file = descripcion[0:48], 
+                    publication = publication_info )
 
         return publication_info
 
@@ -703,6 +726,16 @@ class PublicationSerializer(serializers.ModelSerializer):
            return False
        return True
 
+   def user_is_admin(self, obj):
+       """
+       Verificar si el user es admin
+       """
+       is_admin = False
+       profile_admin = models.ProfileUser.objects.filter(profile = LukaskConstants.PROFILE_ADMIN, user = obj.id)
+       if len(profile_admin) > 0 :
+           is_admin = True
+       return is_admin       
+
 class NotificationReceivedSerializer(serializers.ModelSerializer):
     """
     CLASE SERIALIZADORA PARA EL OBJETO NOTIFICATIONRECEIVED CRUD
@@ -740,3 +773,13 @@ class NotificationSerializer(serializers.ModelSerializer):
 
 
 
+class CompanySerializer(serializers.ModelSerializer):
+    """
+    CLASE SERIALIZADORA PARA OBJETO COMPANIA CRUD
+    """
+
+    class Meta:
+        model = models.Company
+        fields = ('id_company', 'dni', 'description_company', 'telephone_company', 'legal_representative', 'address', 'user_register',  
+                  'date_register', 'user_update', 'date_update', 'active')
+        read_only_fields = ('user_register', 'active')

@@ -23,3 +23,11 @@ class LukaskConstants:
     FILTER_PROVINCE                     = 'province'
     FILTER_CANTON                       = 'canton'
     FILTER_PUBLICATION_USER             = 'pubUserQr'
+    FILTER_PUBLICATION_TYPE             = 'pubTypeQr'
+    FILER_TYPEPUB_PUBLICATION           = "2742791e-8a99-48cb-bf22-2e0c342f0056"
+
+    # ----------------------------------------#
+    #   FILTRO DE PERFILES                    #
+    # ----------------------------------------#
+    PROFILE_ADMIN                       = 'cf1f78a7-5e7e-4cd3-8d26-978bcb95e040'
+    PROFILE_USER                        = 'ed5fd621-b7db-4567-9c09-c2336ce7b0bb'

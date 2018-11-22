@@ -269,7 +269,8 @@ class PublicationViewSet(viewsets.ModelViewSet):
     queryset = models.Publication.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE).order_by('-date_publication')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     parser_classes = (MultiPartParser, FormParser,)
-    filter_backends = (filters.SearchFilter,)
+    filter_backends = (DjangoFilterBackend,) 
+    filter_fields = ('type_publication__id_type_publication', 'type_publication__description')
     search_fields = ('detail', 'location')
     authentication_classes = (TokenAuthentication,)
 
@@ -298,17 +299,20 @@ class PublicationViewSet(viewsets.ModelViewSet):
         :return: List
         """
         req = self.request
-        qr = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_USER)
-        print ("qr", qr)
-        if qr is None:
-            return models.Publication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('-date_register')
+
+        qrusr = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_USER)
+        qrtype = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_TYPE)
+        
+        if qrusr:
+            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, user_register__id = qrusr).order_by('-date_register')
+        elif qrtype:
+            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, type_publication__id_type_publication = qrtype).order_by('-date_register')
         else:
-            print('Else', qr)
-            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, user_register__id = qr).order_by('-date_register')
+            return models.Publication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('-date_register')
 
     def get_serializer_context(self):
         return {'user': self.request.user.email}
-
+   
 class MultimediaViewSet(viewsets.ModelViewSet):
     """"
     HANDLES CREATING, READING AND UPDATING TODOS.
@@ -432,6 +436,27 @@ class ProfileUserViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ProfileUserSerializer
     queryset = models.ProfileUser.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
     filter_backends = (filters.SearchFilter,)
+    permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
+    authentication_classes = (TokenAuthentication,)
+
+    def perform_create(self, serializer):
+        serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
+
+    def get_user_register(self, pk):
+        try:
+            return models.UserProfile.objects.get(pk=pk)
+        except models.UserProfile.DoesNotExist:
+            raise Http404
+
+
+class CompanyViewSet(viewsets.ModelViewSet):
+    """
+    View para gestionar profile
+    """
+    serializer_class = serializers.CompanySerializer
+    queryset = models.Company.objects.exclude(active = LukaskConstants.LOGICAL_STATE_INACTIVE)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('description_company')
     permission_classes = (permissions.UserProfilePublication, IsAuthenticated)
     authentication_classes = (TokenAuthentication,)
 

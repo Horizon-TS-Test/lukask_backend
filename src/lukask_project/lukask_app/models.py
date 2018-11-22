@@ -354,6 +354,7 @@ class Publication(models.Model):
     trans_done = models.BooleanField(default=False)
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE,  null=True, related_name = 'publicationUserReg')
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_pl")
+    company = models.ForeignKey('company', on_delete=models.CASCADE, null=True, related_name="company_pl")
 
     def __str__(self):
         """
@@ -472,4 +473,25 @@ class NotificationReceived(models.Model):
     active                      = models.BooleanField(default=True)
 
 
+
+class Company(models.Model):
+    """
+    MODELO COMPANY  REPRESENTA A LA TABLA lukask_app_company DE LA BD LUKASK_DB
+    """
+    id_company                  = models.UUIDField(primary_key=True, unique=True, default=make_id_model, editable=False)
+    description_company         = models.CharField(max_length=100)
+    dni                         = models.CharField(max_length=15, null = True)
+    telephone_company           = models.CharField(max_length=10, null = True)
+    legal_representative        = models.CharField(max_length=50, null = True)
+    address                     = models.CharField(max_length=70, null = True)
+    subscription_start_date     = models.DateTimeField(null=True, blank = True)
+    subscription_end_date       = models.DateTimeField(null=True, blank = True)
+    date_register               = models.DateTimeField(auto_now_add = True)
+    date_update                 = models.DateTimeField(null=True, blank=True)
+    active                      = models.BooleanField(default = True)
+    user_register               = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True)
+    user_update                 = models.ForeignKey(UserProfile, on_delete=models.CASCADE, null=True, related_name="user_update_comp")
+
+    def __str__(self):
+        return self.description_company
 
