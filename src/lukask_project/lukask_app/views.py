@@ -303,10 +303,12 @@ class PublicationViewSet(viewsets.ModelViewSet):
         qrusr = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_USER)
         qrtype = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_TYPE)
         
-        if qrusr:
+        if qrtype is None and qrusr:
             return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, user_register__id = qrusr).order_by('-date_register')
-        elif qrtype:
+        elif qrusr is None and qrtype:
             return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, type_publication__id_type_publication = qrtype).order_by('-date_register')
+        elif qrtype and qrusr:
+            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, type_publication__id_type_publication = qrtype, user_register__id = qrusr).order_by('-date_register')
         else:
             return models.Publication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('-date_register')
 
