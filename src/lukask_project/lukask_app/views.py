@@ -225,7 +225,7 @@ class PriorityPublicationViewSet(viewsets.ModelViewSet):
 class TypePublicationViewSet(viewsets.ModelViewSet):
     """"
     HANDLES CREATING, READING AND UPDATING TODOS.
-        """
+    """
     serializer_class = serializers.TypePublicationSerializer
     queryset = models.TypePublication.objects.all()
     filter_backends = (filters.SearchFilter,)
@@ -236,11 +236,17 @@ class TypePublicationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user_register = self.request.user, active = LukaskConstants.LOGICAL_STATE_ACTIVE)
 
+    def get_queryset(self):
+        """"
+        METHOD FOR FILTERING THE PUBS TYPE BY ACTIVE FIELD EQUALS TO TRUE
+        """
+        return models.TypePublication.objects.filter(active = True).order_by('description')
+
 
 class TracingViewSet(viewsets.ModelViewSet):
     """"
     HANDLES CREATING, READING AND UPDATING TODOS.
-        """
+    """
     serializer_class = serializers.TracingSerializer
     queryset = models.Tracing.objects.all()
     filter_backends = (filters.SearchFilter,)

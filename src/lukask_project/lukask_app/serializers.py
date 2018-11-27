@@ -153,7 +153,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserProfile
         fields = ('id','email', 'password','media_profile', 'date_update', 'is_active', 'is_admin', 'profile_path', 'person', 'profiles')
-        read_only_fields = ("date_uodate",)
+        read_only_fields = ("date_update",)
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
