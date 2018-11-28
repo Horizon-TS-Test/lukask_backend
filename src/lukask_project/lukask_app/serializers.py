@@ -114,7 +114,7 @@ class PersonSerializer(serializers.ModelSerializer):
         if obj.parish:
             data_json["province"] = json.loads(json.dumps({ "id": str(obj.parish.canton.province.id_province) , "description" : str(obj.parish.canton.province.description_province) }))
             data_json["canton"] = json.loads(json.dumps({ "id": str(obj.parish.canton.id_canton) , "description" : str(obj.parish.canton.description_canton)}))
-            data_json["parish"] = json.loads(json.dumps({ "id ": str(obj.parish.id_parish) , "description" : str(obj.parish.description_parish)}))
+            data_json["parish"] = json.loads(json.dumps({ "id": str(obj.parish.id_parish) , "description" : str(obj.parish.description_parish)}))
 
         return data_json
 
