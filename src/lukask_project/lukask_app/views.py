@@ -10,6 +10,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
+import time
+import datetime
 
 from . import permissions
 from . import serializers
@@ -308,15 +310,32 @@ class PublicationViewSet(viewsets.ModelViewSet):
 
         qrusr = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_USER)
         qrtype = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_TYPE)
+        qr_location = req.query_params.get(LukaskConstants.FILTER_LOCATION_PUB)
+        qr_since_date = req.query_params.get(LukaskConstants.FILTER_SINCE_DATE)
+        qr_until_aate = req.query_params.get(LukaskConstants.FILTER_UNTIL_DATE)
         
-        if qrtype is None and qrusr:
-            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, user_register__id = qrusr).order_by('-date_register')
-        elif qrusr is None and qrtype:
-            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, type_publication__id_type_publication = qrtype).order_by('-date_register')
-        elif qrtype and qrusr:
-            return models.Publication.objects.filter(active= LukaskConstants.LOGICAL_STATE_ACTIVE, type_publication__id_type_publication = qrtype, user_register__id = qrusr).order_by('-date_register')
-        else:
-            return models.Publication.objects.filter(active=LukaskConstants.LOGICAL_STATE_ACTIVE).order_by('-date_register')
+        #validamos que existan rango 
+        range_date = None
+        if qr_since_date:
+            range_date = [qr_since_date, qr_until_aate]
+        
+        if qr_location and qr_since_date is None:
+            since_date = datetime.date.today() - datetime.timedelta(days=7)
+            until_date = datetime.date.today()
+            range_date = [since_date, until_date]
+
+        #Diccionario de busqueda
+        filter_params = {}
+
+        #Armamos diccionario de busqueda
+        filter_params['active'] = LukaskConstants.LOGICAL_STATE_ACTIVE
+        set_if_not_none(filter_params, 'user_register__id', qrusr)
+        set_if_not_none(filter_params, 'type_publication__id_type_publication', qrtype)
+        set_if_not_none(filter_params, 'location', qr_location)
+        set_if_not_none(filter_params, 'date_publication__range', range_date)
+
+        print("filter_params...", filter_params)
+        return models.Publication.objects.filter(**filter_params).order_by('-date_register')
 
     def get_serializer_context(self):
         return {'user': self.request.user.email}
@@ -477,3 +496,7 @@ class CompanyViewSet(viewsets.ModelViewSet):
         except models.UserProfile.DoesNotExist:
             raise Http404
 
+#Agregar datos a mapa 
+def set_if_not_none(mapping, key, value):
+    if value is not None:
+        mapping[key] = value

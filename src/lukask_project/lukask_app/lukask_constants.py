@@ -24,7 +24,12 @@ class LukaskConstants:
     FILTER_CANTON                       = 'canton'
     FILTER_PUBLICATION_USER             = 'pubUserQr'
     FILTER_PUBLICATION_TYPE             = 'pubTypeQr'
-    FILER_TYPEPUB_PUBLICATION           = "2742791e-8a99-48cb-bf22-2e0c342f0056"
+    FILTER_TYPEPUB_PUBLICATION          = '2742791e-8a99-48cb-bf22-2e0c342f0056'
+
+    #-----FILTROS PARA PUBLICACION ----------#
+    FILTER_SINCE_DATE                   = 'sinceDate'
+    FILTER_UNTIL_DATE                   = 'untilDate'
+    FILTER_LOCATION_PUB                 = 'locationPub'   
 
     # ----------------------------------------#
     #   FILTRO DE PERFILES                    #
