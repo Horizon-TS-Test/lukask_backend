@@ -670,7 +670,7 @@ class PublicationSerializer(serializers.ModelSerializer):
         medios = validated_data.pop('medios_data')
         user_reg = validated_data.get('user_register')
         type_pub = validated_data.get('type_publication')
-        if str(type_pub.id_type_publication) == LukaskConstants.FILER_TYPEPUB_PUBLICATION:
+        if str(type_pub.id_type_publication) == LukaskConstants.FILTER_TYPEPUB_PUBLICATION:
             
             if user_is_admin(user_reg):
                 publication_info = models.Publication.objects.create(**validated_data)
