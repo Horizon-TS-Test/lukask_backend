@@ -12,6 +12,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 import time
 import datetime
+#from datetime import datetime, time
+
 
 from . import permissions
 from . import serializers
@@ -312,14 +314,21 @@ class PublicationViewSet(viewsets.ModelViewSet):
         qrtype = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_TYPE)
         qr_location = req.query_params.get(LukaskConstants.FILTER_LOCATION_PUB)
         qr_since_date = req.query_params.get(LukaskConstants.FILTER_SINCE_DATE)
-        qr_until_aate = req.query_params.get(LukaskConstants.FILTER_UNTIL_DATE)
+        qr_until_date = req.query_params.get(LukaskConstants.FILTER_UNTIL_DATE)
+        
+        #Consultas que se realizen solo de un dia especifico
+        only_one_day = None
+        if(qr_since_date is not None and qr_until_date is not None and (qr_since_date in qr_until_date)):
+            date_qr = datetime.datetime.strptime(qr_since_date, '%Y-%m-%d')
+            only_one_day = datetime.date(date_qr.year, date_qr.month, date_qr.day)
+        
         
         #validamos que existan rango 
         range_date = None
-        if qr_since_date:
-            range_date = [qr_since_date, qr_until_aate]
+        if qr_since_date and  only_one_day is None:
+            range_date = [qr_since_date, qr_until_date]
         
-        if qr_location and qr_since_date is None:
+        if qr_location and  only_one_day is None and qr_since_date is None:
             since_date = datetime.date.today() - datetime.timedelta(days=7)
             until_date = datetime.date.today()
             range_date = [since_date, until_date]
@@ -332,6 +341,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         set_if_not_none(filter_params, 'user_register__id', qrusr)
         set_if_not_none(filter_params, 'type_publication__id_type_publication', qrtype)
         set_if_not_none(filter_params, 'location', qr_location)
+        set_if_not_none(filter_params, 'date_publication__date', only_one_day)
         set_if_not_none(filter_params, 'date_publication__range', range_date)
 
         print("filter_params...", filter_params)
