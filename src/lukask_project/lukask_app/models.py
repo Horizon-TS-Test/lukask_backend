@@ -354,6 +354,7 @@ class Publication(models.Model):
     user_register = models.ForeignKey('userProfile', on_delete=models.CASCADE,  null=True, related_name = 'publicationUserReg')
     user_update = models.ForeignKey('userProfile', on_delete=models.CASCADE, null=True, related_name="user_update_pl")
     company = models.ForeignKey('company', on_delete=models.CASCADE, null=True, related_name="company_pl")
+    parish  = models.ForeignKey('parish', on_delete=models.CASCADE, null=True, related_name='parish_pl')
 
     def __str__(self):
         """
