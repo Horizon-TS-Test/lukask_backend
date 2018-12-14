@@ -312,7 +312,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
 
         qrusr = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_USER)
         qrtype = req.query_params.get(LukaskConstants.FILTER_PUBLICATION_TYPE)
-        qr_location = req.query_params.get(LukaskConstants.FILTER_LOCATION_PUB)
+        qr_location = req.query_params.get(LukaskConstants.FILTER_PARISH_PUB)
         qr_since_date = req.query_params.get(LukaskConstants.FILTER_SINCE_DATE)
         qr_until_date = req.query_params.get(LukaskConstants.FILTER_UNTIL_DATE)
         
@@ -329,8 +329,8 @@ class PublicationViewSet(viewsets.ModelViewSet):
             range_date = [qr_since_date, qr_until_date]
         
         if qr_location and  only_one_day is None and qr_since_date is None:
-            since_date = datetime.date.today() - datetime.timedelta(days=7)
-            until_date = datetime.date.today()
+            since_date = datetime.date.today() - datetime.timedelta(days=8)
+            until_date = datetime.date.today() +  datetime.timedelta(1)
             range_date = [since_date, until_date]
 
         #Diccionario de busqueda
@@ -340,7 +340,7 @@ class PublicationViewSet(viewsets.ModelViewSet):
         filter_params['active'] = LukaskConstants.LOGICAL_STATE_ACTIVE
         set_if_not_none(filter_params, 'user_register__id', qrusr)
         set_if_not_none(filter_params, 'type_publication__id_type_publication', qrtype)
-        set_if_not_none(filter_params, 'location', qr_location)
+        set_if_not_none(filter_params, 'parish', qr_location)
         set_if_not_none(filter_params, 'date_publication__date', only_one_day)
         set_if_not_none(filter_params, 'date_publication__range', range_date)
 

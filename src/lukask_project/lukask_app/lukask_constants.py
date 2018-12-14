@@ -29,7 +29,7 @@ class LukaskConstants:
     #-----FILTROS PARA PUBLICACION ----------#
     FILTER_SINCE_DATE                   = 'sinceDate'
     FILTER_UNTIL_DATE                   = 'untilDate'
-    FILTER_LOCATION_PUB                 = 'locationPub'   
+    FILTER_PARISH_PUB                   = 'parish'   
 
     # ----------------------------------------#
     #   FILTRO DE PERFILES                    #
