@@ -95,7 +95,7 @@ class PersonSerializer(serializers.ModelSerializer):
     # UNCOMMENT NEXT LINE IF DOMAIN URL IS NOT NEEDED:
     # prod_image = serializers.ImageField(use_url=False)
 
-    location = serializers.SerializerMethodField();
+    location = serializers.SerializerMethodField()
     class Meta:
         model = models.Person
         fields = ('id_person', 'age', 'identification_card', 'name', 'last_name', 'telephone', 'cell_phone', 'birthdate',

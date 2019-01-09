@@ -9,7 +9,9 @@ constantly==15.1.0
 daphne==1.4.2
 Django==1.11
 django-cors-headers==2.1.0
+django-filter==1.1.0
 django-rest-framework==0.1.0
+django-sslserver==0.20
 django-tornado-websockets==0.2.2
 djangorestframework==3.7.7
 hyperlink==18.0.0
@@ -17,8 +19,10 @@ idna==2.6
 incremental==17.5.0
 msgpack-python==0.5.6
 pgpubsub==0.0.5
+Pillow==5.2.0
 psycogreen==1.0
 psycopg2==2.7.4
+psycopg2-binary==2.7.5
 pytz==2018.3
 redis==2.10.6
 six==1.11.0
